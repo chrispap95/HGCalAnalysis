@@ -77,9 +77,33 @@ using namespace std;
 bool DRAWPLOTS  = false;  // draw plots or not (make "Fig" directory first before turning this on)
 bool VERBOSE    = false;  // print out mean +/- sigma for each channel or not
 
+// Assemble a list of inputfiles
+
+std::vector<std::string> GetInputFiles(std::string geoConfig)
+{
+  int numFiles = 20;
+  std::string path = "/cms/data/store/user/bcaraway/condor/outputs/";
+  std::string startName = "ttbar_10_4_";
+  std::string midName = "_pt25_numEvent1000_CMSSW_10_4_0_pre2_";
+  std::string endName = "_v01.root";
+  std::vector<std::string> inputFiles;
+  
+  for( int iFile = 0 ; iFile<numFiles ; iFile++ )
+    {
+      std::ostringstream fileName;
+      fileName << path << startName << geoConfig << midName << iFile << endName;
+      inputFiles.push_back(fileName.str());
+     
+    }
+
+  return inputFiles;
+
+}
+
 //
 // Book histograms
 //
+
 void book1D(TList *v_hist, std::string name, int n, double min, double max);
 void book1DProf(TList *v_hist, std::string name, int n, double min, double max, double ymin, double ymax, Option_t *option);
 
@@ -103,7 +127,7 @@ void relabel2D   (TList *v_hist, std::string name); // added by Bryan
 //
 // Main analyzer
 //
-void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=2) 
+void PFCheckRun(std::vector<std::string> inputFiles, TString outfile, int maxevents=-1, int option=2) 
 { 
 
    cout << "[PF analyzer] Running option " << option << " for " << endl; 
@@ -116,25 +140,31 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
    //
    TChain *ch = new TChain("hgcalTupleTree/tree");
 
-   std::string filename(rootfile);
-   std::string::size_type idx;
-   idx = filename.rfind('.');
-   std::string extension = filename.substr(idx+1);
-   std::string line;
+   //std::string filename(rootfile);
+   //std::string::size_type idx;
+   //idx = filename.rfind('.');
+   //std::string extension = filename.substr(idx+1);
+   //std::string line;
    
-   if(idx != std::string::npos && extension=="txt")
-     {
-       std::cout << rootfile << " " << extension << std::endl;
-       std::ifstream in(rootfile);
-       while (std::getline(in, line)) {     // Process line
-	 if (line.size()>0) ch->Add(line.c_str());
-       }
-     }
-   else
-     {
-       // No extension found
-       ch->Add(rootfile);
-     }
+   //if(idx != std::string::npos && extension=="txt")
+   //  {
+   //    std::cout << rootfile << " " << extension << std::endl;
+   //    std::ifstream in(rootfile);
+   //    while (std::getline(in, line)) {     // Process line
+   //	 if (line.size()>0) ch->Add(line.c_str());
+   //    }
+   //  }
+   //else
+   //  {
+   //    // No extension found
+   //    ch->Add(rootfile);
+   //  }
+
+
+   for (unsigned int iFile=0; iFile<inputFiles.size(); ++iFile) {
+    ch->Add(inputFiles[iFile].c_str());
+    std::cout<<inputFiles[iFile]<<std::endl;
+   }
 
    printf("%d;\n",ch->GetNtrees());
    printf("%lld;\n",ch->GetEntries());
@@ -198,6 +228,32 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
    TTreeReaderArray<int> GenParPdgId = {fReader, "GenParPdgId"};
    TTreeReaderArray<int> GenParStatus = {fReader, "GenParStatus"};
    TTreeReaderArray<int> GeneralTracksNValidHits = {fReader, "GeneralTracksNValidHits"};
+
+   TTreeReaderArray<double> GenJetsPt = {fReader, "GenJetsPt"};
+   TTreeReaderArray<double> GenJetsEta = {fReader, "GenJetsEta"};
+   TTreeReaderArray<double> GenJetsPhi = {fReader, "GenJetsPhi"};
+   TTreeReaderArray<double> GenJetsEnergy = {fReader, "GenJetsEnergy"};
+   TTreeReaderArray<double> PFJetsPt = {fReader, "PFJetsPt"};
+   TTreeReaderArray<double> PFJetsEta = {fReader, "PFJetsEta"};
+   TTreeReaderArray<double> PFJetsPhi = {fReader, "PFJetsPhi"};
+   TTreeReaderArray<double> PFJetsEnergy = {fReader, "PFJetsEnergy"};
+   
+   TTreeReaderArray<float> PFJetsChargedHadronMultiplicity = {fReader, "PFJetsChargedHadronMultiplicity"};
+   TTreeReaderArray<float> PFJetsElectronEnergyFraction = {fReader, "PFJetsElectronEnergyFraction"};
+   TTreeReaderArray<float> PFJetsElectronMultiplicity = {fReader, "PFJetsElectronMultiplicity"};
+   TTreeReaderArray<float> PFJetsMuonMultiplicity = {fReader, "PFJetsMuonMultiplicity"};
+   TTreeReaderArray<float> PFJetsNeutralHadronMultiplicity = {fReader, "PFJetsNeutralHadronMultiplicity"};
+   TTreeReaderArray<float> PFJetsPhotonEnergyFraction = {fReader, "PFJetsPhotonEnergyFraction"};
+   TTreeReaderArray<float> PFJetsPhotonMultiplicity = {fReader, "PFJetsPhotonMultiplicity"};
+
+   TTreeReaderArray<float> PFJetsrecoJetsHFEMEnergyFraction = {fReader, "PFJetsrecoJetsHFEMEnergyFraction"};
+   TTreeReaderArray<float> PFJetsrecoJetsHFHadronEnergyFraction = {fReader, "PFJetsrecoJetsHFHadronEnergyFraction"};
+   TTreeReaderArray<float> PFJetsrecoJetschargedEmEnergyfraction = {fReader, "PFJetsrecoJetschargedEmEnergyFraction"};
+   TTreeReaderArray<float> PFJetsrecoJetschargedHadronEnergyFraction = {fReader, "PFJetsrecoJetschargedHadronEnergyFraction"};
+   TTreeReaderArray<float> PFJetsrecoJetsmuonEnergyFraction = {fReader, "PFJetsrecoJetsmuonEnergyFraction"};
+   TTreeReaderArray<float> PFJetsrecoJetsneutralEmEnergyFraction = {fReader, "PFJetsrecoJetsneutralEmEnergyFraction"};
+   TTreeReaderArray<float> PFJetsrecoJetsneutralEnergyFraction = {fReader, "PFJetsrecoJetsneutralEnergyFraction"};
+
    /*
    TTreeReaderArray<int> HBHERecHitAux = {fReader, "HBHERecHitAux"};
    TTreeReaderArray<int> HBHERecHitDepth = {fReader, "HBHERecHitDepth"};
@@ -222,6 +278,9 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
    */
    TTreeReaderArray<int> PFParPdgId = {fReader, "PFParPdgId"};
    TTreeReaderArray<int> PFParStatus = {fReader, "PFParStatus"};
+   TTreeReaderArray<double> PFParMET = {fReader, "PFParMET"};
+   TTreeReaderArray<double> PFMET = {fReader, "PFMET"};
+   TTreeReaderArray<double> GenMET = {fReader, "GenMET"};
    TTreeReaderValue<UInt_t> bx = {fReader, "bx"};
    TTreeReaderValue<UInt_t> event = {fReader, "event"};
    TTreeReaderValue<UInt_t> ls = {fReader, "ls"};
@@ -242,8 +301,9 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
    cout << "[HGCal analyzer] The number of entries is: " << nentries << endl;
 
    bool debug=false;
-   bool debug_met =true;
-   
+   bool debug_met =false;
+   bool print_prev = false;
+
    //---------------------------------------------------------------------------------------------------------
    // main event loop
    //---------------------------------------------------------------------------------------------------------
@@ -267,6 +327,7 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
      tlzv_temp.SetPtEtaPhiM(0.0,0.0,0.0,0.0);  // for MET
      
      double PFMass = 0; // for hardcoded mass in GeV, PFM suffers from a rounding error.     
+     
 
      // Begin Loop
      for (int ipfcand = 0, npfcand =  PFParPt.GetSize(); ipfcand < npfcand; ++ipfcand) {
@@ -361,13 +422,13 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
 	 fill1D(v_hist, strtmp, PFParEta[ipfcand]);
        }
 
-       if (PFParPdgId[ipfcand] == 6) { // testing other pfcand in vector
-	 strtmp = "PFTask_PFEta_testPhoton";
+       if (PFParPdgId[ipfcand] == 6) { // for HF Hadron
+	 strtmp = "PFTask_PFEta_HF_Hadron";
 	 fill1D(v_hist, strtmp, PFParEta[ipfcand]);
        }
        
-       if (PFParPdgId[ipfcand] == 7) { // testing other pfcand in vector
-	 strtmp = "PFTask_PFEta_testHadron";
+       if (PFParPdgId[ipfcand] == 7) { // for HF Photon
+	 strtmp = "PFTask_PFEta_HF_Photon";
 	 fill1D(v_hist, strtmp, PFParEta[ipfcand]);
        }
        
@@ -670,11 +731,87 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
        } // Endcap
             
      } // PF candidiate loop
+     bool debug_met_V2 = true; 
+
+     //if  (tlzv.Pt() > 200 && debug_met_V2){
+     //  std::cout << "MET: "<<tlzv.Pt()<<std::endl;
+     //}
+     fill1D(v_hist, "PFTask_MET", tlzv.Pt());  // for MET
      
-     if  (debug_met){
-       std::cout << "MET: "<<tlzv.Pt()<<std::endl;
+     fill1D(v_hist, "PFParMET", PFParMET[0]);     // MET calculated before ntuple step
+     //fill1D(v_hist, "PFMET"   , PFMET[0]   );     // True MET
+     fill1D(v_hist, "GenMET"  , GenMET[0]  );     // Gen MET
+     
+     if (GenMET[0] < 10) {
+       fill1D(v_hist, "PFMET", PFMET[0]   ); // exclude events where met is largely due to neutrinos 
      }
-     fill1D(v_hist, "PFTask_MET", tlzv.Et());  // for MET
+
+
+     if (tlzv.Pt() - PFMET[0] > abs(5.)){ 
+       std::cout << "\nCalculated MET:\t\t " << tlzv.Pt() <<"\nCalculated before ntuple MET:\t " <<PFParMET[0] << "\nTrue MET:\t\t "<<PFMET[0]<<std::endl;
+     }
+     ///
+     /// DEBUG MET
+     ///
+     
+     if ((GenMET[0]< 10 && PFMET[0] > 200) && debug_met_V2){
+       
+       tlzv.SetPtEtaPhiM(0.0,0.0,0.0,0.0);       // for MET
+       tlzv_temp.SetPtEtaPhiM(0.0,0.0,0.0,0.0);  // for MET
+
+       for (int ipfcand = 0, npfcand =  PFParPt.GetSize(); ipfcand < npfcand; ++ipfcand) {
+	 
+	 if (PFParPdgId[ipfcand] == 1) PFMass = .13957 ; // charged hadron --> Pion
+	 if (PFParPdgId[ipfcand] == 2) PFMass = .000511 ; // electron
+	 if (PFParPdgId[ipfcand] == 3) PFMass = .1057 ; // muon
+	 if (PFParPdgId[ipfcand] == 4) PFMass = 0. ; // photon
+	 if (PFParPdgId[ipfcand] == 5) PFMass = .49761 ; // neutral hadron --> K0L
+	 if (PFParPdgId[ipfcand] == 6) PFMass = .13957 ; // HF Hadron --> Pion
+	 if (PFParPdgId[ipfcand] == 7) PFMass = 0. ; // HF EM Particle --> Photon
+
+	 tlzv_temp.SetPtEtaPhiM(PFParPt[ipfcand],PFParEta[ipfcand],PFParPhi[ipfcand],PFMass);
+	 tlzv += tlzv_temp;
+	 
+	 if (PFParPt[ipfcand] > 10){
+	   std::cout << "PFID: "<< PFParPdgId[ipfcand] << ", Pt: " << PFParPt[ipfcand] << ", Eta: " << PFParEta[ipfcand] << ", Phi: " << PFParPhi[ipfcand] << ", Mass: " << PFMass << std::endl;
+	   //std::cout<< "Summed PT: " << tlzv.Pt() << std::endl;
+	 }
+       }
+     }
+
+     ///
+     /// END DEBUG MET
+     ///
+
+     ///
+     /// Gen Jet and PF Jet analysis
+     ///
+
+     // Gen
+     tlzv.SetPtEtaPhiE(0.0,0.0,0.0,0.0);       // for MET                                                                                                 
+     tlzv_temp.SetPtEtaPhiE(0.0,0.0,0.0,0.0);  // for MET   
+
+     for (int ijet = 0, njet = GenJetsPt.GetSize(); ijet < njet; ++ijet) {
+      
+       tlzv_temp.SetPtEtaPhiE(GenJetsPt[ijet],GenJetsEta[ijet],GenJetsPhi[ijet],GenJetsEnergy[ijet]);
+       tlzv += tlzv_temp;
+ 
+     }
+     
+     fill1D(v_hist, "GenJetMET", tlzv.Pt());
+
+     // PF
+     tlzv.SetPtEtaPhiE(0.0,0.0,0.0,0.0);       // for MET                                                                                                 
+     tlzv_temp.SetPtEtaPhiE(0.0,0.0,0.0,0.0);  // for MET   
+
+     for (int ijet = 0, njet = PFJetsPt.GetSize(); ijet < njet; ++ijet) {
+      
+       tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet],PFJetsEta[ijet],PFJetsPhi[ijet],PFJetsEnergy[ijet]);
+       tlzv += tlzv_temp;
+ 
+     }
+     
+     fill1D(v_hist, "PFJetMET", tlzv.Pt());
 
    }   // Event loop ends
    //---------------------------------------------------------------------------------------------------------
@@ -695,9 +832,21 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
 // Main function
 //
 //void ana_PFStudy(TString rootfile="../../HGCalTreeMaker/test/ttbar_10_4_D30_pt25.root",TString outfile="pfstudy_histograms.root",int maxevents=-1)
-void ana_PFStudy(TString rootfile="./ttbar_10_4_D30_pt25.root",TString outfile="PFD30_histos.root",int maxevents=-1)
+void ana_PFStudy(std::string rootfile="./ttbar_10_4_D28_pt25.root",TString outfile="PFD28_histos.root",int maxevents=-1)
 {
-  PFCheckRun(rootfile, outfile, maxevents, 0);
+  // edit 
+  bool test_file = false; // if testing setup with single file (will have to edit below for file choice)
+  std::string geoType = "D28" ; // "D30" for D30 geo, "D28" for D28
+
+  std::vector<std::string> inputFiles;
+  if (!test_file)
+    {
+      inputFiles = GetInputFiles(geoType);
+     
+    }
+  else inputFiles.push_back(rootfile);
+
+  PFCheckRun(inputFiles, outfile, maxevents, 0);
 }
 
 //
@@ -780,10 +929,10 @@ void bookHistograms(TList *v_hist)
   sprintf(histo, "PFTask_PFEta_Photon");
   book1D(v_hist, histo, 100, -5., 5.);
 
-  sprintf(histo, "PFTask_PFEta_testPhoton");
+  sprintf(histo, "PFTask_PFEta_HF_Hadron");
   book1D(v_hist, histo, 100, -5., 5.);
 
-  sprintf(histo, "PFTask_PFEta_testHadron");
+  sprintf(histo, "PFTask_PFEta_HF_Photon");
   book1D(v_hist, histo, 100, -5., 5.);
 
   ///
@@ -791,8 +940,27 @@ void bookHistograms(TList *v_hist)
   ///
   
   sprintf(histo, "PFTask_MET");
-  book1D(v_hist, histo, 100, 0., 100.);
+  book1D(v_hist, histo, 300, 0., 300.);
   
+  sprintf(histo, "PFParMET");
+  book1D(v_hist, histo, 300, 0., 300.);
+
+  sprintf(histo, "PFMET");
+  book1D(v_hist, histo, 300, 0., 300.);
+
+  sprintf(histo, "GenMET");
+  book1D(v_hist, histo, 300, 0., 300.);
+
+  ///
+  /// Jets
+  ///
+  
+  sprintf(histo, "GenJetMET");
+  book1D(v_hist, histo, 300, 0., 300.);
+  
+  sprintf(histo, "PFJetMET");
+  book1D(v_hist, histo, 300, 0., 300.);
+
   //
   // Charged hadrons
   //

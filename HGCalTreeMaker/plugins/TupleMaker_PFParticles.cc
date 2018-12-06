@@ -3,6 +3,8 @@
 #include "DataFormats/Common/interface/View.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 
+#include "TLorentzVector.h"
+
 TupleMaker_PFCandidates::TupleMaker_PFCandidates(const edm::ParameterSet& iConfig):
   inputTag    (iConfig.getUntrackedParameter<edm::InputTag>("source")),
   prefix      (iConfig.getUntrackedParameter<std::string>  ("Prefix")),
@@ -30,6 +32,12 @@ TupleMaker_PFCandidates::TupleMaker_PFCandidates(const edm::ParameterSet& iConfi
   produces< std::vector< float > >(prefix + "HcalFrac5"  + suffix );
   produces< std::vector< float > >(prefix + "HcalFrac6"  + suffix );
   produces< std::vector< float > >(prefix + "HcalFrac7"  + suffix );
+  
+  produces< std::vector< double > >(prefix + "Time"      + suffix );
+  produces< std::vector< double > >(prefix + "DTime"     + suffix );
+  produces< std::vector< double > >(prefix + "TimeError" + suffix );
+
+  produces             < double >  (prefix + "MET"       + suffix );
 
   if(bool_PackedCandidate){
     pflowPackedToken_ = consumes<std::vector<pat::PackedCandidate> >(inputTag);
@@ -37,7 +45,7 @@ TupleMaker_PFCandidates::TupleMaker_PFCandidates(const edm::ParameterSet& iConfi
     pflowToken_ = consumes<std::vector<reco::PFCandidate> >(inputTag);
   }
 
-  debug=true;
+  debug=false;
   
 }
 
@@ -63,10 +71,22 @@ void TupleMaker_PFCandidates::produce(edm::Event& iEvent, const edm::EventSetup&
   std::unique_ptr<std::vector<float>  >            hcalFrac5             ( new std::vector<float>            ());
   std::unique_ptr<std::vector<float>  >            hcalFrac6             ( new std::vector<float>            ());
   std::unique_ptr<std::vector<float>  >            hcalFrac7             ( new std::vector<float>            ());
+
+  std::unique_ptr<std::vector<double>  >            time                 ( new std::vector<double>            ());
+  std::unique_ptr<std::vector<double>  >            dTime                 ( new std::vector<double>            ());
+  std::unique_ptr<std::vector<double>  >            timeError            ( new std::vector<double>            ());
   
+  std::unique_ptr<            double   >            MET                  ( new             double             ());
+
   //
   //-----
   //
+
+  TLorentzVector tlzv ;       // for MET 
+  tlzv.SetPtEtaPhiM(0.0,0.0,0.0,0.0);
+  TLorentzVector tlzv_temp ;      // for MET 
+  tlzv_temp.SetPtEtaPhiM(0.0,0.0,0.0,0.0);
+
   if(bool_PackedCandidate){
     edm::Handle<std::vector<pat::PackedCandidate> > packedParticleFlow;
     iEvent.getByToken(pflowPackedToken_, packedParticleFlow);
@@ -95,10 +115,20 @@ void TupleMaker_PFCandidates::produce(edm::Event& iEvent, const edm::EventSetup&
       phi->push_back(c.phi());
       mass->push_back(c.mass());
 
+      time->push_back(c.time());
+      dTime->push_back(c.dtime());
+      timeError->push_back(c.timeError());
+
+
       pdgid->push_back(c.pdgId());
       status->push_back(c.status());
 
+      tlzv_temp.SetPtEtaPhiM(c.pt(),c.eta(),c.phi(),c.mass());
+      tlzv += tlzv_temp;
+
     }
+
+    *MET = tlzv.Pt() ;
       
   //
   //-----
@@ -130,9 +160,16 @@ void TupleMaker_PFCandidates::produce(edm::Event& iEvent, const edm::EventSetup&
       phi->push_back(c.phi());
       mass->push_back(c.mass());
 
+      time->push_back(c.time());
+      
+      timeError->push_back(c.timeError());
+
       pdgid->push_back(c.particleId());
       status->push_back(c.status());
-
+      
+      tlzv_temp.SetPtEtaPhiM(c.pt(),c.eta(),c.phi(),c.mass());
+      tlzv += tlzv_temp;
+	
       if (c.energy()>0.){
 	ecalEnergyFrac->push_back(c.ecalEnergy()/c.energy());
 	hcalEnergyFrac->push_back(c.hcalEnergy()/c.energy());
@@ -152,9 +189,14 @@ void TupleMaker_PFCandidates::produce(edm::Event& iEvent, const edm::EventSetup&
       hcalFrac6->push_back(c.hcalDepthEnergyFraction(6));
       hcalFrac7->push_back(c.hcalDepthEnergyFraction(7));
 
-      
+      time->push_back(c.time());
+
+      timeError->push_back(c.timeError());
+
     }
     
+    *MET = tlzv.Pt() ;
+
   //
   //-----
   //
@@ -180,7 +222,13 @@ void TupleMaker_PFCandidates::produce(edm::Event& iEvent, const edm::EventSetup&
   iEvent.put(move( hcalFrac5       ) , prefix + "HcalFrac5"  + suffix );
   iEvent.put(move( hcalFrac6       ) , prefix + "HcalFrac6"  + suffix );
   iEvent.put(move( hcalFrac7       ) , prefix + "HcalFrac7"  + suffix );
+
+  iEvent.put(move( time            ) , prefix + "Time"       + suffix );
+  iEvent.put(move( dTime           ) , prefix + "DTime"      + suffix );
+  iEvent.put(move( timeError       ) , prefix + "TimeError"  + suffix );
   
+  iEvent.put(move( MET             ) , prefix + "MET"        + suffix );
+
 }
 
 

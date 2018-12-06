@@ -15,7 +15,7 @@ config.JobType.allowUndistributedCMSSW = True
 config.section_("Data")
 # MC example
 config.Data.inputDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader/'
-config.Data.inputDataset = '/TTbar_14TeV/hatake-CMSSW_10_3_0_pre1_Step1_v1-1d94015c49f0b857fbb3502bf6e93b08/USER'
+config.Data.inputDataset = '/TTbar_14TeV/bcaraway-CMSSW_10_4_0_pre2_Step1_v2-d9d63d39c8a507115cae73bfbb01e78d/USER'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
 #KH config.Data.totalUnits = 100
@@ -30,9 +30,9 @@ config.Data.unitsPerJob = 1
 
 config.Data.publication = True
 config.Data.publishDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter/' # Parameter Data.publishDbsUrl has been renamed to Data.publishDBS
-config.Data.outputDatasetTag = 'CMSSW_10_3_0_pre1_Step2_v1' # <== Check!!!
+config.Data.outputDatasetTag = 'CMSSW_10_4_0_pre2_Step2_v3' # <== Check!!!
 
-config.Data.outLFNDirBase = '/store/user/hatake/crab_outputs'  # Data.outLFN has been renamed to Data.outLFNDirBase
+config.Data.outLFNDirBase = '/store/user/bcaraway/crab_outputs'  # Data.outLFN has been renamed to Data.outLFNDirBase
 config.Data.ignoreLocality = True
 
 config.section_("Site")
