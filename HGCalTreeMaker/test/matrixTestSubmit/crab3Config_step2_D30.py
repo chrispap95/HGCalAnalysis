@@ -15,7 +15,7 @@ config.JobType.allowUndistributedCMSSW = False
 config.section_("Data")
 # MC example
 config.Data.inputDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSReader/'
-config.Data.inputDataset = '/TTbar_14TeV/bcaraway-CMSSW_10_4_0_pre2_D30_Step1_v2-bf22a9fcb0c0b8ca16c87498a27c5fad/USER'
+config.Data.inputDataset = '/TTbar_14TeV/bcaraway-CMSSW_10_4_0_pre2_D30_Step1_v3-bf22a9fcb0c0b8ca16c87498a27c5fad/USER'
 config.Data.splitting = 'FileBased'
 config.Data.unitsPerJob = 1
 #KH config.Data.totalUnits = 100
@@ -30,7 +30,7 @@ config.Data.unitsPerJob = 1
 
 config.Data.publication = True
 config.Data.publishDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter/' # Parameter Data.publishDbsUrl has been renamed to Data.publishDBS
-config.Data.outputDatasetTag = 'CMSSW_10_4_0_pre2_D30_Step2_v2' # <== Check!!!
+config.Data.outputDatasetTag = 'CMSSW_10_4_0_pre2_D30_Step2_v4' # <== Check!!!
 
 config.Data.outLFNDirBase = '/store/user/bcaraway/crab_outputs'  # Data.outLFN has been renamed to Data.outLFNDirBase
 config.Data.ignoreLocality = True

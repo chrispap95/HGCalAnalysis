@@ -20,7 +20,7 @@ config.Data.totalUnits = config.Data.unitsPerJob * NJOBS
 
 config.Data.publication = True
 config.Data.publishDBS = 'https://cmsweb.cern.ch/dbs/prod/phys03/DBSWriter/' # Parameter Data.publishDbsUrl has been renamed to Data.publishDBS
-config.Data.outputDatasetTag = 'CMSSW_10_4_0_pre2_D30_Step1_v2' # <== Check!!!
+config.Data.outputDatasetTag = 'CMSSW_10_4_0_pre2_D30_Step1_v3' # <== Check!!!
 
 config.Data.outLFNDirBase = '/store/user/bcaraway/crab_outputs'  # Data.outLFN has been renamed to Data.outLFNDirBase
 config.Data.outputPrimaryDataset = 'TTbar_14TeV'
