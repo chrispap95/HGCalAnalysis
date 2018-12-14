@@ -32,7 +32,7 @@ cd ${MYCMSSW}/src
 scramv1 b ProjectRename
 eval `scramv1 runtime -csh` # cmsenv is an alias not on the workers
 cmsRun ../../run_HGCalTupleMaker_2023_PF_full.py maxEvents=1000 skipEvents=`echo ${1}\*1000|bc`
-foreach f (`ls *10_4_D30*.root`) # # <=== to be checked
+foreach f (`ls *10_4_D28*.root`) # # <=== to be checked
    echo $f
    set name=`basename $f .root`
    echo $name
