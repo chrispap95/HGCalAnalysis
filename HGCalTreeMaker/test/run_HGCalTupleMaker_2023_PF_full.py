@@ -13,8 +13,8 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing ('analysis')
 process = cms.Process("Trees",eras.Phase2) 
 
-do_D28  = True
-do_D30  = False
+do_D28  = False
+do_D30  = True
 
 
 ##
@@ -51,8 +51,8 @@ if options.isMINIAOD:
 else:
     D28_path = '/store/user/bcaraway/crab_outputs/TTbar_14TeV/CMSSW_10_4_0_pre2_Step3_v2/181127_023858/0000/step3_'
     D30_path = '/store/user/bcaraway/crab_outputs/TTbar_14TeV/CMSSW_10_4_0_pre2_D30_Step3_v3/181207_200604/0000/step3_'
-    options.inputFiles = [D28_path+str(i)+'.root' for i in range(1,100) if do_D28]
-    options.inputFiles = [D30_path+str(i)+'.root' for i in range(1,100) if do_D30]
+    options.inputFiles = [D28_path+str(i)+'.root' for i in range(1,101) if do_D28]
+    options.inputFiles = [D30_path+str(i)+'.root' for i in range(1,101) if do_D30]
     #options.inputFiles = [D28_path+str(i)+'.root' for i in range(100)]
     if do_D28: options.outputFile = 'ttbar_10_4_D28_pt25.root'
     if do_D30: options.outputFile = 'ttbar_10_4_D30_pt25.root'

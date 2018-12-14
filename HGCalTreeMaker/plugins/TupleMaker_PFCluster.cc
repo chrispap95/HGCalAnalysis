@@ -19,7 +19,11 @@ TupleMaker_PFCluster::TupleMaker_PFCluster(const edm::ParameterSet& iConfig):
   produces< std::vector< double > >(prefix + "Eta" + suffix );
   produces< std::vector< double > >(prefix + "Phi" + suffix );
   produces< std::vector< double > >(prefix + "Size" + suffix );
-   
+  produces< std::vector< float  > >(prefix + "Time" + suffix );
+  produces< std::vector< float  > >(prefix + "TimeE" + suffix );  
+  produces< std::vector< double > >(prefix + "Depth" + suffix );
+  
+  
   PFClusterTok_ = consumes<std::vector<reco::PFCluster>>(inputTag);
 
 }
@@ -33,6 +37,9 @@ void TupleMaker_PFCluster::produce(edm::Event& iEvent, const edm::EventSetup& iS
   std::unique_ptr<std::vector<double> > eta    ( new std::vector<double>       ());
   std::unique_ptr<std::vector<double> > phi    ( new std::vector<double>       ());
   std::unique_ptr<std::vector<double> > size   ( new std::vector<double>       ());
+  std::unique_ptr<std::vector<float> > time   ( new std::vector<float>       ());
+  std::unique_ptr<std::vector<float> > timeE   ( new std::vector<float>       ());
+  std::unique_ptr<std::vector<double> > depth   ( new std::vector<double>       ());
   
   edm::Handle< std::vector<reco::PFCluster> > pfClusters;
   iEvent.getByToken(PFClusterTok_, pfClusters);
@@ -47,6 +54,9 @@ void TupleMaker_PFCluster::produce(edm::Event& iEvent, const edm::EventSetup& iS
     eta->push_back(pfClusters->at(iPart).eta());
     phi->push_back(pfClusters->at(iPart).phi());
     size->push_back(pfClusters->at(iPart).size());
+    time->push_back(pfClusters->at(iPart).time());
+    timeE->push_back(pfClusters->at(iPart).timeError());
+    depth->push_back(pfClusters->at(iPart).depth());
 
   }
 
@@ -57,6 +67,9 @@ void TupleMaker_PFCluster::produce(edm::Event& iEvent, const edm::EventSetup& iS
   iEvent.put(move( eta              ) , prefix + "Eta"      + suffix );
   iEvent.put(move( phi              ) , prefix + "Phi"      + suffix );
   iEvent.put(move( size             ) , prefix + "Size"     + suffix );
+  iEvent.put(move( time             ) , prefix + "Time"     + suffix );
+  iEvent.put(move( timeE             ) , prefix + "TimeE"     + suffix );
+  iEvent.put(move( depth             ) , prefix + "Depth"     + suffix );
 		      
 }
 		      

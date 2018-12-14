@@ -37,6 +37,8 @@
 #include <iomanip> // for setw()
 #include <algorithm> 
 
+#include "../include/fReader.h" // Read from TTRee
+
 #include "TROOT.h"
 #include "TF1.h"
 #include "TMath.h"
@@ -73,6 +75,7 @@
 #endif
 
 using namespace std;
+using namespace globalTChain;
 
 bool DRAWPLOTS  = false;  // draw plots or not (make "Fig" directory first before turning this on)
 bool VERBOSE    = false;  // print out mean +/- sigma for each channel or not
@@ -169,125 +172,9 @@ void PFCheckRun(std::vector<std::string> inputFiles, TString outfile, int maxeve
 
    printf("%d;\n",ch->GetNtrees());
    printf("%lld;\n",ch->GetEntries());
-
-   TTreeReader     fReader(ch);  //!the tree reader
-
-   //
-   // Set up TTreeReader's
-   // -- use MakeSelector of root
-   //
-   // Readers to access the data (delete the ones you do not need).
-
-   TTreeReaderArray<double> GenParEta = {fReader, "GenParEta"};
-   TTreeReaderArray<double> GenParM = {fReader, "GenParM"};
-   TTreeReaderArray<double> GenParPhi = {fReader, "GenParPhi"};
-   TTreeReaderArray<double> GenParPt = {fReader, "GenParPt"};
-   TTreeReaderArray<double> GeneralTracksD0 = {fReader, "GeneralTracksD0"};
-   TTreeReaderArray<double> GeneralTracksDZ = {fReader, "GeneralTracksDZ"};
-   TTreeReaderArray<double> GeneralTracksEta = {fReader, "GeneralTracksEta"};
-   TTreeReaderArray<double> GeneralTracksPhi = {fReader, "GeneralTracksPhi"};
-   TTreeReaderArray<double> GeneralTracksPt = {fReader, "GeneralTracksPt"};
-   TTreeReaderArray<double> PFParEta = {fReader, "PFParEta"};
-   TTreeReaderArray<double> PFParM = {fReader, "PFParM"};
-   TTreeReaderArray<double> PFParPhi = {fReader, "PFParPhi"};
-   TTreeReaderArray<double> PFParPt = {fReader, "PFParPt"};
-   /*
-   TTreeReaderArray<float> HBHERecHitEnergy = {fReader, "HBHERecHitEnergy"};
-   TTreeReaderArray<float> HBHERecHitEta = {fReader, "HBHERecHitEta"};
-   TTreeReaderArray<float> HBHERecHitPhi = {fReader, "HBHERecHitPhi"};
-   TTreeReaderArray<float> HBHERecHitTime = {fReader, "HBHERecHitTime"};
-   TTreeReaderArray<float> HGCRecHitEnergy = {fReader, "HGCRecHitEnergy"};
-   TTreeReaderArray<float> HGCRecHitEta = {fReader, "HGCRecHitEta"};
-   TTreeReaderArray<float> HGCRecHitPhi = {fReader, "HGCRecHitPhi"};
-   TTreeReaderArray<float> HGCRecHitPosx = {fReader, "HGCRecHitPosx"};
-   TTreeReaderArray<float> HGCRecHitPosy = {fReader, "HGCRecHitPosy"};
-   TTreeReaderArray<float> HGCRecHitPosz = {fReader, "HGCRecHitPosz"};
-   TTreeReaderArray<float> HGCSimHitsEnergy = {fReader, "HGCSimHitsEnergy"};
-   TTreeReaderArray<float> HGCSimHitsEta = {fReader, "HGCSimHitsEta"};
-   TTreeReaderArray<float> HGCSimHitsPhi = {fReader, "HGCSimHitsPhi"};
-   TTreeReaderArray<float> HGCSimHitsPosx = {fReader, "HGCSimHitsPosx"};
-   TTreeReaderArray<float> HGCSimHitsPosy = {fReader, "HGCSimHitsPosy"};
-   TTreeReaderArray<float> HGCSimHitsPosz = {fReader, "HGCSimHitsPosz"};
-   TTreeReaderArray<float> HGCSimHitsTime = {fReader, "HGCSimHitsTime"};
-   TTreeReaderArray<float> SimTracksEta = {fReader, "SimTracksEta"};
-   TTreeReaderArray<float> SimTracksPhi = {fReader, "SimTracksPhi"};
-   TTreeReaderArray<float> SimTracksPt = {fReader, "SimTracksPt"};
-   TTreeReaderArray<float> SimTracksR = {fReader, "SimTracksR"};
-   TTreeReaderArray<float> SimTracksZ = {fReader, "SimTracksZ"};
-   */
-   TTreeReaderArray<float> PFParEcalEnergyFrac = {fReader, "PFParEcalEnergyFrac"};
-   TTreeReaderArray<float> PFParHOEnergyFrac = {fReader, "PFParHOEnergyFrac"};
-   TTreeReaderArray<float> PFParHcalEnergyFrac = {fReader, "PFParHcalEnergyFrac"};
-   TTreeReaderArray<float> PFParHcalFrac1 = {fReader, "PFParHcalFrac1"};
-   TTreeReaderArray<float> PFParHcalFrac2 = {fReader, "PFParHcalFrac2"};
-   TTreeReaderArray<float> PFParHcalFrac3 = {fReader, "PFParHcalFrac3"};
-   TTreeReaderArray<float> PFParHcalFrac4 = {fReader, "PFParHcalFrac4"};
-   TTreeReaderArray<float> PFParHcalFrac5 = {fReader, "PFParHcalFrac5"};
-   TTreeReaderArray<float> PFParHcalFrac6 = {fReader, "PFParHcalFrac6"};
-   TTreeReaderArray<float> PFParHcalFrac7 = {fReader, "PFParHcalFrac7"};
-   TTreeReaderArray<float> PFParTrackPt = {fReader, "PFParTrackPt"};
-   TTreeReaderArray<int> GenParPdgId = {fReader, "GenParPdgId"};
-   TTreeReaderArray<int> GenParStatus = {fReader, "GenParStatus"};
-   TTreeReaderArray<int> GeneralTracksNValidHits = {fReader, "GeneralTracksNValidHits"};
-
-   TTreeReaderArray<double> GenJetsPt = {fReader, "GenJetsPt"};
-   TTreeReaderArray<double> GenJetsEta = {fReader, "GenJetsEta"};
-   TTreeReaderArray<double> GenJetsPhi = {fReader, "GenJetsPhi"};
-   TTreeReaderArray<double> GenJetsEnergy = {fReader, "GenJetsEnergy"};
-   TTreeReaderArray<double> PFJetsPt = {fReader, "PFJetsPt"};
-   TTreeReaderArray<double> PFJetsEta = {fReader, "PFJetsEta"};
-   TTreeReaderArray<double> PFJetsPhi = {fReader, "PFJetsPhi"};
-   TTreeReaderArray<double> PFJetsEnergy = {fReader, "PFJetsEnergy"};
    
-   TTreeReaderArray<float> PFJetsChargedHadronMultiplicity = {fReader, "PFJetsChargedHadronMultiplicity"};
-   TTreeReaderArray<float> PFJetsElectronMultiplicity = {fReader, "PFJetsElectronMultiplicity"};
-   TTreeReaderArray<float> PFJetsMuonMultiplicity = {fReader, "PFJetsMuonMultiplicity"};
-   TTreeReaderArray<float> PFJetsNeutralHadronMultiplicity = {fReader, "PFJetsNeutralHadronMultiplicity"};
-   TTreeReaderArray<float> PFJetsPhotonEnergyFraction = {fReader, "PFJetsPhotonEnergyFraction"};
-   TTreeReaderArray<float> PFJetsPhotonMultiplicity = {fReader, "PFJetsPhotonMultiplicity"};
 
-   TTreeReaderArray<float> PFJetsElectronEnergyFraction = {fReader, "PFJetsElectronEnergyFraction"};
-
-   TTreeReaderArray<float> PFJetsrecoJetsHFEMEnergyFraction = {fReader, "PFJetsrecoJetsHFEMEnergyFraction"};
-   TTreeReaderArray<float> PFJetsrecoJetsHFHadronEnergyFraction = {fReader, "PFJetsrecoJetsHFHadronEnergyFraction"};
-   TTreeReaderArray<float> PFJetsrecoJetschargedEmEnergyfraction = {fReader, "PFJetsrecoJetschargedEmEnergyFraction"};
-   TTreeReaderArray<float> PFJetsrecoJetschargedHadronEnergyFraction = {fReader, "PFJetsrecoJetschargedHadronEnergyFraction"};
-   TTreeReaderArray<float> PFJetsrecoJetsmuonEnergyFraction = {fReader, "PFJetsrecoJetsmuonEnergyFraction"};
-   TTreeReaderArray<float> PFJetsrecoJetsneutralEmEnergyFraction = {fReader, "PFJetsrecoJetsneutralEmEnergyFraction"};
-   TTreeReaderArray<float> PFJetsrecoJetsneutralEnergyFraction = {fReader, "PFJetsrecoJetsneutralEnergyFraction"};
-
-   /*
-   TTreeReaderArray<int> HBHERecHitAux = {fReader, "HBHERecHitAux"};
-   TTreeReaderArray<int> HBHERecHitDepth = {fReader, "HBHERecHitDepth"};
-   TTreeReaderArray<int> HBHERecHitFlags = {fReader, "HBHERecHitFlags"};
-   TTreeReaderArray<int> HBHERecHitHPDid = {fReader, "HBHERecHitHPDid"};
-   TTreeReaderArray<int> HBHERecHitIEta = {fReader, "HBHERecHitIEta"};
-   TTreeReaderArray<int> HBHERecHitIPhi = {fReader, "HBHERecHitIPhi"};
-   TTreeReaderArray<int> HBHERecHitRBXid = {fReader, "HBHERecHitRBXid"};
-   TTreeReaderArray<int> HGCRecHitIndex = {fReader, "HGCRecHitIndex"};
-   TTreeReaderArray<int> HGCRecHitLayer = {fReader, "HGCRecHitLayer"};
-   TTreeReaderArray<int> HGCSimHitsCellU = {fReader, "HGCSimHitsCellU"};
-   TTreeReaderArray<int> HGCSimHitsCellV = {fReader, "HGCSimHitsCellV"};
-   TTreeReaderArray<int> HGCSimHitsIEta = {fReader, "HGCSimHitsIEta"};
-   TTreeReaderArray<int> HGCSimHitsIPhi = {fReader, "HGCSimHitsIPhi"};
-   TTreeReaderArray<int> HGCSimHitsIndex = {fReader, "HGCSimHitsIndex"};
-   TTreeReaderArray<int> HGCSimHitsLayer = {fReader, "HGCSimHitsLayer"};
-   TTreeReaderArray<int> HGCSimHitsSubdet = {fReader, "HGCSimHitsSubdet"};
-   TTreeReaderArray<int> HGCSimHitsWaferU = {fReader, "HGCSimHitsWaferU"};
-   TTreeReaderArray<int> HGCSimHitsWaferV = {fReader, "HGCSimHitsWaferV"};
-   TTreeReaderArray<int> SimTracksCharge = {fReader, "SimTracksCharge"};
-   TTreeReaderArray<int> SimTracksPID = {fReader, "SimTracksPID"};
-   */
-   TTreeReaderArray<int> PFParPdgId = {fReader, "PFParPdgId"};
-   TTreeReaderArray<int> PFParStatus = {fReader, "PFParStatus"};
-   TTreeReaderArray<double> PFParMET = {fReader, "PFParMET"};
-   TTreeReaderArray<double> PFMET = {fReader, "PFMET"};
-   TTreeReaderArray<double> GenMET = {fReader, "GenMET"};
-   TTreeReaderValue<UInt_t> bx = {fReader, "bx"};
-   TTreeReaderValue<UInt_t> event = {fReader, "event"};
-   TTreeReaderValue<UInt_t> ls = {fReader, "ls"};
-   TTreeReaderValue<UInt_t> orbit = {fReader, "orbit"};
-   TTreeReaderValue<UInt_t> run = {fReader, "run"};
+   fReader.SetTree(ch);  //the tree reader (Defined in fReader.h)
 
    //
    // Define histograms to fill
