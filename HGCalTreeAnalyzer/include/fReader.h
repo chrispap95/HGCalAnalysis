@@ -52,30 +52,30 @@ namespace globalTChain
   TTreeReaderArray<double> PFParM = {fReader, "PFParM"};
   TTreeReaderArray<double> PFParPhi = {fReader, "PFParPhi"};
   TTreeReaderArray<double> PFParPt = {fReader, "PFParPt"};
-  /*
-    TTreeReaderArray<float> HBHERecHitEnergy = {fReader, "HBHERecHitEnergy"};
-    TTreeReaderArray<float> HBHERecHitEta = {fReader, "HBHERecHitEta"};
-    TTreeReaderArray<float> HBHERecHitPhi = {fReader, "HBHERecHitPhi"};
-    TTreeReaderArray<float> HBHERecHitTime = {fReader, "HBHERecHitTime"};
-    TTreeReaderArray<float> HGCRecHitEnergy = {fReader, "HGCRecHitEnergy"};
-    TTreeReaderArray<float> HGCRecHitEta = {fReader, "HGCRecHitEta"};
-    TTreeReaderArray<float> HGCRecHitPhi = {fReader, "HGCRecHitPhi"};
-    TTreeReaderArray<float> HGCRecHitPosx = {fReader, "HGCRecHitPosx"};
-    TTreeReaderArray<float> HGCRecHitPosy = {fReader, "HGCRecHitPosy"};
-    TTreeReaderArray<float> HGCRecHitPosz = {fReader, "HGCRecHitPosz"};
-    TTreeReaderArray<float> HGCSimHitsEnergy = {fReader, "HGCSimHitsEnergy"};
-    TTreeReaderArray<float> HGCSimHitsEta = {fReader, "HGCSimHitsEta"};
-    TTreeReaderArray<float> HGCSimHitsPhi = {fReader, "HGCSimHitsPhi"};
-    TTreeReaderArray<float> HGCSimHitsPosx = {fReader, "HGCSimHitsPosx"};
-    TTreeReaderArray<float> HGCSimHitsPosy = {fReader, "HGCSimHitsPosy"};
-    TTreeReaderArray<float> HGCSimHitsPosz = {fReader, "HGCSimHitsPosz"};
-    TTreeReaderArray<float> HGCSimHitsTime = {fReader, "HGCSimHitsTime"};
-    TTreeReaderArray<float> SimTracksEta = {fReader, "SimTracksEta"};
-    TTreeReaderArray<float> SimTracksPhi = {fReader, "SimTracksPhi"};
-    TTreeReaderArray<float> SimTracksPt = {fReader, "SimTracksPt"};
-   TTreeReaderArray<float> SimTracksR = {fReader, "SimTracksR"};
-   TTreeReaderArray<float> SimTracksZ = {fReader, "SimTracksZ"};
-  */
+  
+  //TTreeReaderArray<float> HBHERecHitEnergy = {fReader, "HBHERecHitEnergy"};
+  //TTreeReaderArray<float> HBHERecHitEta = {fReader, "HBHERecHitEta"};
+  //TTreeReaderArray<float> HBHERecHitPhi = {fReader, "HBHERecHitPhi"};
+  //TTreeReaderArray<float> HBHERecHitTime = {fReader, "HBHERecHitTime"};
+  TTreeReaderArray<float> HGCRecHitEnergy = {fReader, "HGCRecHitEnergy"};
+  TTreeReaderArray<float> HGCRecHitEta = {fReader, "HGCRecHitEta"};
+  TTreeReaderArray<float> HGCRecHitPhi = {fReader, "HGCRecHitPhi"};
+  TTreeReaderArray<float> HGCRecHitPosx = {fReader, "HGCRecHitPosx"};
+  TTreeReaderArray<float> HGCRecHitPosy = {fReader, "HGCRecHitPosy"};
+  TTreeReaderArray<float> HGCRecHitPosz = {fReader, "HGCRecHitPosz"};
+  TTreeReaderArray<float> HGCSimHitsEnergy = {fReader, "HGCSimHitsEnergy"};
+  TTreeReaderArray<float> HGCSimHitsEta = {fReader, "HGCSimHitsEta"};
+  TTreeReaderArray<float> HGCSimHitsPhi = {fReader, "HGCSimHitsPhi"};
+  TTreeReaderArray<float> HGCSimHitsPosx = {fReader, "HGCSimHitsPosx"};
+  TTreeReaderArray<float> HGCSimHitsPosy = {fReader, "HGCSimHitsPosy"};
+  TTreeReaderArray<float> HGCSimHitsPosz = {fReader, "HGCSimHitsPosz"};
+  //TTreeReaderArray<float> HGCSimHitsTime = {fReader, "HGCSimHitsTime"};
+  //TTreeReaderArray<float> SimTracksEta = {fReader, "SimTracksEta"};
+  //TTreeReaderArray<float> SimTracksPhi = {fReader, "SimTracksPhi"};
+  //TTreeReaderArray<float> SimTracksPt = {fReader, "SimTracksPt"};
+  //TTreeReaderArray<float> SimTracksR = {fReader, "SimTracksR"};
+  //TTreeReaderArray<float> SimTracksZ = {fReader, "SimTracksZ"};
+  
   TTreeReaderArray<float> PFParEcalEnergyFrac = {fReader, "PFParEcalEnergyFrac"};
   TTreeReaderArray<float> PFParHOEnergyFrac = {fReader, "PFParHOEnergyFrac"};
   TTreeReaderArray<float> PFParHcalEnergyFrac = {fReader, "PFParHcalEnergyFrac"};
@@ -117,6 +117,7 @@ namespace globalTChain
   TTreeReaderArray<float> PFJetsrecoJetsneutralEmEnergyFraction = {fReader, "PFJetsrecoJetsneutralEmEnergyFraction"};
   TTreeReaderArray<float> PFJetsrecoJetsneutralEnergyFraction = {fReader, "PFJetsrecoJetsneutralEnergyFraction"};
   
+  TTreeReaderArray<double> PFClusterECALPt = {fReader, "PFClusterECALPt"};
   TTreeReaderArray<double> PFClusterECALEnergy = {fReader, "PFClusterECALEnergy"};
   TTreeReaderArray<double> PFClusterECALEta = {fReader, "PFClusterECALEta"};
   TTreeReaderArray<double> PFClusterECALPhi = {fReader, "PFClusterECALPhi"};
@@ -128,6 +129,7 @@ namespace globalTChain
   TTreeReaderArray<float> PFClusterECALTimeE = {fReader, "PFClusterECALTimeE"};
   TTreeReaderArray<double> PFClusterECALDepth = {fReader, "PFClusterECALDepth"};
   
+  TTreeReaderArray<double> PFClusterHCALPt = {fReader, "PFClusterHCALPt"};
   TTreeReaderArray<double> PFClusterHCALEnergy = {fReader, "PFClusterHCALEnergy"};
   TTreeReaderArray<double> PFClusterHCALEta = {fReader, "PFClusterHCALEta"};
   TTreeReaderArray<double> PFClusterHCALPhi = {fReader, "PFClusterHCALPhi"};
@@ -139,6 +141,7 @@ namespace globalTChain
   TTreeReaderArray<float> PFClusterHCALTimeE = {fReader, "PFClusterHCALTimeE"};
   TTreeReaderArray<double> PFClusterHCALDepth = {fReader, "PFClusterHCALDepth"};
   
+  TTreeReaderArray<double> PFClusterHGCalPt = {fReader, "PFClusterHGCalPt"};
   TTreeReaderArray<double> PFClusterHGCalEnergy = {fReader, "PFClusterHGCalEnergy"};
   TTreeReaderArray<double> PFClusterHGCalEta = {fReader, "PFClusterHGCalEta"};
   TTreeReaderArray<double> PFClusterHGCalPhi = {fReader, "PFClusterHGCalPhi"};
@@ -150,6 +153,7 @@ namespace globalTChain
   TTreeReaderArray<float> PFClusterHGCalTimeE = {fReader, "PFClusterHGCalTimeE"};
   TTreeReaderArray<double> PFClusterHGCalDepth = {fReader, "PFClusterHGCalDepth"};
   
+  TTreeReaderArray<double> PFClusterHFPt = {fReader, "PFClusterHFPt"};
   TTreeReaderArray<double> PFClusterHFEnergy = {fReader, "PFClusterHFEnergy"};
   TTreeReaderArray<double> PFClusterHFEta = {fReader, "PFClusterHFEta"};
   TTreeReaderArray<double> PFClusterHFPhi = {fReader, "PFClusterHFPhi"};
@@ -161,6 +165,7 @@ namespace globalTChain
   TTreeReaderArray<float> PFClusterHFTimeE = {fReader, "PFClusterHFTimeE"};
   TTreeReaderArray<double> PFClusterHFDepth = {fReader, "PFClusterHFDepth"};
   
+  TTreeReaderArray<double> PFClusterHOPt = {fReader, "PFClusterHOPt"};
   TTreeReaderArray<double> PFClusterHOEnergy = {fReader, "PFClusterHOEnergy"};
   TTreeReaderArray<double> PFClusterHOEta = {fReader, "PFClusterHOEta"};
   TTreeReaderArray<double> PFClusterHOPhi = {fReader, "PFClusterHOPhi"};
@@ -172,6 +177,7 @@ namespace globalTChain
   TTreeReaderArray<float> PFClusterHOTimeE = {fReader, "PFClusterHOTimeE"};
   TTreeReaderArray<double> PFClusterHODepth = {fReader, "PFClusterHODepth"};
 
+  TTreeReaderArray<double> PFClusterHGCalFromMultiCLPt = {fReader, "PFClusterHGCalFromMultiCLPt"};
   TTreeReaderArray<double> PFClusterHGCalFromMultiCLEnergy = {fReader, "PFClusterHGCalFromMultiCLEnergy"};
   TTreeReaderArray<double> PFClusterHGCalFromMultiCLEta = {fReader, "PFClusterHGCalFromMultiCLEta"};
   TTreeReaderArray<double> PFClusterHGCalFromMultiCLPhi = {fReader, "PFClusterHGCalFromMultiCLPhi"};
@@ -182,28 +188,28 @@ namespace globalTChain
   TTreeReaderArray<float> PFClusterHGCalFromMultiCLTime = {fReader, "PFClusterHGCalFromMultiCLTime"};
   TTreeReaderArray<float> PFClusterHGCalFromMultiCLTimeE = {fReader, "PFClusterHGCalFromMultiCLTimeE"};
   TTreeReaderArray<double> PFClusterHGCalFromMultiCLDepth = {fReader, "PFClusterHGCalFromMultiCLDepth"};
-  /*
-    TTreeReaderArray<int> HBHERecHitAux = {fReader, "HBHERecHitAux"};
-    TTreeReaderArray<int> HBHERecHitDepth = {fReader, "HBHERecHitDepth"};
-    TTreeReaderArray<int> HBHERecHitFlags = {fReader, "HBHERecHitFlags"};
-    TTreeReaderArray<int> HBHERecHitHPDid = {fReader, "HBHERecHitHPDid"};
-    TTreeReaderArray<int> HBHERecHitIEta = {fReader, "HBHERecHitIEta"};
-    TTreeReaderArray<int> HBHERecHitIPhi = {fReader, "HBHERecHitIPhi"};
-    TTreeReaderArray<int> HBHERecHitRBXid = {fReader, "HBHERecHitRBXid"};
-    TTreeReaderArray<int> HGCRecHitIndex = {fReader, "HGCRecHitIndex"};
-    TTreeReaderArray<int> HGCRecHitLayer = {fReader, "HGCRecHitLayer"};
-    TTreeReaderArray<int> HGCSimHitsCellU = {fReader, "HGCSimHitsCellU"};
-    TTreeReaderArray<int> HGCSimHitsCellV = {fReader, "HGCSimHitsCellV"};
-    TTreeReaderArray<int> HGCSimHitsIEta = {fReader, "HGCSimHitsIEta"};
-    TTreeReaderArray<int> HGCSimHitsIPhi = {fReader, "HGCSimHitsIPhi"};
-    TTreeReaderArray<int> HGCSimHitsIndex = {fReader, "HGCSimHitsIndex"};
-    TTreeReaderArray<int> HGCSimHitsLayer = {fReader, "HGCSimHitsLayer"};
-    TTreeReaderArray<int> HGCSimHitsSubdet = {fReader, "HGCSimHitsSubdet"};
-    TTreeReaderArray<int> HGCSimHitsWaferU = {fReader, "HGCSimHitsWaferU"};
-    TTreeReaderArray<int> HGCSimHitsWaferV = {fReader, "HGCSimHitsWaferV"};
-    TTreeReaderArray<int> SimTracksCharge = {fReader, "SimTracksCharge"};
-    TTreeReaderArray<int> SimTracksPID = {fReader, "SimTracksPID"};
-  */
+  
+  //TTreeReaderArray<int> HBHERecHitAux = {fReader, "HBHERecHitAux"};
+  //TTreeReaderArray<int> HBHERecHitDepth = {fReader, "HBHERecHitDepth"};
+  //TTreeReaderArray<int> HBHERecHitFlags = {fReader, "HBHERecHitFlags"};
+  //TTreeReaderArray<int> HBHERecHitHPDid = {fReader, "HBHERecHitHPDid"};
+  //TTreeReaderArray<int> HBHERecHitIEta = {fReader, "HBHERecHitIEta"};
+  //TTreeReaderArray<int> HBHERecHitIPhi = {fReader, "HBHERecHitIPhi"};
+  //TTreeReaderArray<int> HBHERecHitRBXid = {fReader, "HBHERecHitRBXid"};
+  TTreeReaderArray<int> HGCRecHitIndex = {fReader, "HGCRecHitIndex"};
+  TTreeReaderArray<int> HGCRecHitLayer = {fReader, "HGCRecHitLayer"};
+  TTreeReaderArray<int> HGCSimHitsCellU = {fReader, "HGCSimHitsCellU"};
+  TTreeReaderArray<int> HGCSimHitsCellV = {fReader, "HGCSimHitsCellV"};
+  TTreeReaderArray<int> HGCSimHitsIEta = {fReader, "HGCSimHitsIEta"};
+  TTreeReaderArray<int> HGCSimHitsIPhi = {fReader, "HGCSimHitsIPhi"};
+  TTreeReaderArray<int> HGCSimHitsIndex = {fReader, "HGCSimHitsIndex"};
+  TTreeReaderArray<int> HGCSimHitsLayer = {fReader, "HGCSimHitsLayer"};
+  TTreeReaderArray<int> HGCSimHitsSubdet = {fReader, "HGCSimHitsSubdet"};
+  TTreeReaderArray<int> HGCSimHitsWaferU = {fReader, "HGCSimHitsWaferU"};
+  TTreeReaderArray<int> HGCSimHitsWaferV = {fReader, "HGCSimHitsWaferV"};
+  //TTreeReaderArray<int> SimTracksCharge = {fReader, "SimTracksCharge"};
+  //TTreeReaderArray<int> SimTracksPID = {fReader, "SimTracksPID"};
+  
   TTreeReaderArray<int> PFParPdgId = {fReader, "PFParPdgId"};
   TTreeReaderArray<int> PFParStatus = {fReader, "PFParStatus"};
   TTreeReaderArray<double> PFParMET = {fReader, "PFParMET"};

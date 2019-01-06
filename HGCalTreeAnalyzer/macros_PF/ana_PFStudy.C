@@ -319,7 +319,7 @@ void PFCheckRun(std::vector<std::string> inputFiles, TString outfile, int maxeve
      bool debug_met_V2    = false; 
      //=========ONLY SET ONE TO "TRUE"================
      bool low_GenMET        = false; // set to true if doing low Gen study
-     bool jet_at_boundary   = true; // set to true if doing at least one jet at HGCal boundary study
+     bool jet_at_boundary   = false; // set to true if doing at least one jet at HGCal boundary study
      bool norm_jet          = true; // no constaints 
      bool large_neutral     = false; // jet makeup consists of a large amount of neutral hadrons/Em
      bool gen_neutral_ratio = false;  // gen particle ratio consists of a noticable amount of neutral particls
@@ -570,7 +570,28 @@ void PFCheckRun(std::vector<std::string> inputFiles, TString outfile, int maxeve
        fill1D(v_hist, "PFJetMET", tlzv.Pt());
        fill1D(v_hist, "PFMET", PFMET[0]   );
      } 
-      
+     // PFCLUSER analysis ================================================================================
+     for (int iclust = 0, nclust = PFClusterHGCalEta.GetSize(); iclust < nclust; ++iclust) {
+       fill1D(v_hist,"PFClusterPtvsEta",PFClusterHGCalEta[iclust], PFClusterHGCalPt[iclust]/(nentries*delta_phi*delta_eta));
+       fill1D(v_hist,"PFClustEta",PFClusterHGCalEta[iclust]);
+       fill1D(v_hist,"PFClustDepth", PFClusterHGCalDepth[iclust]);
+       //if (abs(PFClusterHGCalEta[iclust]) < .2){
+       //fill1D(v_hist,"NearZeroEta_ClustPt",abs(PFClusterHGCalPt[iclust]));
+	 //if (PFClusterHGCalPt[iclust] != 0) std::cout<<"Eta:\t"<<PFClusterHGCalEta[iclust]<<"\tPt:\t"<<PFClusterHGCalPt[iclust]<<"\tPhi:\t"<<PFClusterHGCalPhi[iclust]<<std::endl;
+       }
+     }
+     for (int isim = 0, nsim = HGCSimHitsEta.GetSize(); isim < nsim; ++isim){
+       fill1D(v_hist,"SimHitEta",HGCSimHitsEta[isim]);
+       fill1D(v_hist,"SimHitEvsEta",HGCSimHitsEta[isim], HGCSimHitsEnergy[isim]/(nentries*delta_phi*delta_eta));
+     }
+     for (int ireco = 0, nreco = HGCRecHitEta.GetSize(); ireco < nreco; ++ireco){
+       fill1D(v_hist,"RecHitEta",HGCRecHitEta[ireco]);
+       fill1D(v_hist,"RecHitEvsEta",HGCRecHitEta[ireco], HGCRecHitEnergy[ireco]/(nentries*delta_phi*delta_eta));
+       //if (abs(HGCRecHitEta[ireco]) < .2){
+       //fill1D(v_hist,"NearZeroEta_RecHitEnergy",HGCRecHitEnergy[ireco]);
+	 //if (HGCRecHitEnergy[ireco] >= 20) std::cout<<"Eta:\t"<<HGCRecHitEta[ireco]<<"\tEnergy:\t"<<HGCRecHitEnergy[ireco]<<"\tPhi:\t"<<HGCRecHitPhi[ireco]<<std::endl;
+       }
+     }
    }   // Event loop ends
    //---------------------------------------------------------------------------------------------------------
    // main event loop ends
@@ -756,6 +777,29 @@ void bookHistograms(TList *v_hist)
   sprintf(histo, "PFtotalneutralEFraction");
   book1D(v_hist, histo, 110, 0., 1.1  );
   
+  ///
+  /// PF Clusters
+  ///
+
+  sprintf(histo, "PFClustEta");
+  book1D(v_hist, histo, 100, -5., 5. ); 
+  sprintf(histo, "PFClusterPtvsEta");
+  book1D(v_hist, histo, 100, -5., 5.);
+  sprintf(histo, "PFClustDepth");
+  book1D(v_hist, histo, 100, -2., 2.);
+  sprintf(histo,"NearZeroEta_ClustPt");
+  book1D(v_hist, histo, 200, 0, 2);
+
+  sprintf(histo, "SimHitEta");
+  book1D(v_hist, histo, 100, -5., 5. ); 
+  sprintf(histo,"SimHitEvsEta");
+  book1D(v_hist, histo, 100, -5., 5.);
+  sprintf(histo, "RecHitEta");
+  book1D(v_hist, histo, 100, -5., 5.);
+  sprintf(histo,"RecHitEvsEta");
+  book1D(v_hist, histo, 100, -5., 5. ); 
+  sprintf(histo,"NearZeroEta_RecHitEnergy");
+  book1D(v_hist, histo, 200, 0, 2);
 }
 //
 // relabel 1DProf histograms

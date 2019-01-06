@@ -13,8 +13,8 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing ('analysis')
 process = cms.Process("Trees",eras.Phase2) 
 
-do_D28  = False
-do_D30  = True
+do_D28  = True
+do_D30  = False
 
 
 ##

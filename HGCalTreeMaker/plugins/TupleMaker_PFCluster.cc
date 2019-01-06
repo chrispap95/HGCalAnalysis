@@ -10,7 +10,8 @@ TupleMaker_PFCluster::TupleMaker_PFCluster(const edm::ParameterSet& iConfig):
   prefix      (iConfig.getUntrackedParameter<std::string>  ("Prefix")),
   suffix      (iConfig.getUntrackedParameter<std::string>  ("Suffix"))
 {
-   
+  
+  produces< std::vector< double > >(prefix + "Pt"   + suffix );
   produces< std::vector< double > >(prefix + "PosX" + suffix );
   produces< std::vector< double > >(prefix + "PosY" + suffix );
   produces< std::vector< double > >(prefix + "PosZ" + suffix );
@@ -29,7 +30,8 @@ TupleMaker_PFCluster::TupleMaker_PFCluster(const edm::ParameterSet& iConfig):
 }
 
 void TupleMaker_PFCluster::produce(edm::Event& iEvent, const edm::EventSetup& iSetup){
-
+  
+  std::unique_ptr<std::vector<double> > pt     ( new std::vector<double>       ());
   std::unique_ptr<std::vector<double> > posX   ( new std::vector<double>       ());
   std::unique_ptr<std::vector<double> > posY   ( new std::vector<double>       ());
   std::unique_ptr<std::vector<double> > posZ   ( new std::vector<double>       ());
@@ -47,6 +49,7 @@ void TupleMaker_PFCluster::produce(edm::Event& iEvent, const edm::EventSetup& iS
   for(unsigned int iPart = 0 ; iPart < pfClusters->size(); ++iPart){
     //const reco::PFCluster& cluster = (*pfClusters)[iPart];
     
+    pt->push_back(pfClusters->at(iPart).pt());
     posX->push_back(pfClusters->at(iPart).x());
     posY->push_back(pfClusters->at(iPart).y());
     posZ->push_back(pfClusters->at(iPart).z());
@@ -60,6 +63,7 @@ void TupleMaker_PFCluster::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
   }
 
+  iEvent.put(move( pt               ) , prefix + "Pt"     + suffix );
   iEvent.put(move( posX             ) , prefix + "PosX"     + suffix );
   iEvent.put(move( posY             ) , prefix + "PosY"     + suffix );
   iEvent.put(move( posZ             ) , prefix + "PosZ"     + suffix );
