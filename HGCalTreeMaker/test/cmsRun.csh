@@ -9,7 +9,7 @@ echo "source done"
 #
 # TO BE CHECKED before submission
 #
-setenv MYCMSSW CMSSW_10_3_X_2018-07-31-2300 ## <========= TO BE CHECKED
+setenv MYCMSSW CMSSW_10_4_0_pre2 ## <========= TO BE CHECKED
 setenv VERSION v01                        ## <========= TO BE CHECKED
 #
 #
@@ -23,7 +23,7 @@ voms-proxy-info
 voms-proxy-info -fqan
 #
 ### for case 1. EOS have the following line, otherwise remove this line in case 2.
-xrdcp -s root://kodiak-se.baylor.edu//store/user/hatake/condor/tarballs/${MYCMSSW}_HGCAL_condor.tgz .
+xrdcp -s root://kodiak-se.baylor.edu//store/user/bcaraway/condor/tarballs/${MYCMSSW}_HGCAL_condor.tgz .
 tar -xf ${MYCMSSW}_HGCAL_condor.tgz
 rm ${MYCMSSW}_HGCAL_condor.tgz
 #setenv SCRAM_ARCH slc6_amd64_gcc530
@@ -31,12 +31,12 @@ ls -R
 cd ${MYCMSSW}/src
 scramv1 b ProjectRename
 eval `scramv1 runtime -csh` # cmsenv is an alias not on the workers
-cmsRun ../../run_HGCalTupleMaker_2023_full.py maxEvents=1000 skipEvents=`echo ${1}\*1000|bc`
-foreach f (`ls *trees*.root`)
+cmsRun ../../run_HGCalTupleMaker_2023_PF_full.py maxEvents=1000 skipEvents=`echo ${1}\*1000|bc`
+foreach f (`ls *10_4_D28*.root`) # # <=== to be checked
    echo $f
    set name=`basename $f .root`
    echo $name
-   gfal-copy --just-copy ${f} gsiftp://kodiak-se.baylor.edu/cms/data/store/user/hatake/condor/outputs/${name}_${MYCMSSW}_${1}_${VERSION}.root
+   gfal-copy --just-copy ${f} gsiftp://kodiak-se.baylor.edu/cms/data/store/user/bcaraway/condor/outputs/${name}_${MYCMSSW}_${1}_${VERSION}.root
 end
 #gfal-copy --just-copy relval_minbias_2018_MCfull.root gsiftp://kodiak-se.baylor.edu/cms/data/store/user/hatake/condor/outputs/relval_minbias_2018_MCfull_${MYCMSSW}_${1}_${VERSION}.root
 ### remove the output file if you don't want it automatically transferred when the job ends

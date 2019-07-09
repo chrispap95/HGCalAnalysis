@@ -3,3 +3,6 @@
 *~
 *#
 HGCalTreeMaker/python/__init__.py
+crab_*
+crab.log
+log/

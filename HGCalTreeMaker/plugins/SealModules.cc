@@ -12,6 +12,11 @@
 #include "HGCalAnalysis/HGCalTreeMaker/interface/HGCalTupleMaker_SimTracks.h"
 #include "HGCalAnalysis/HGCalTreeMaker/interface/HGCalTupleMaker_RecoTracks.h"
 #include "HGCalAnalysis/HGCalTreeMaker/interface/TupleMaker_PFCandidates.h"
+#include "HGCalAnalysis/HGCalTreeMaker/interface/TupleMaker_PFCluster.h"
+#include "HGCalAnalysis/HGCalTreeMaker/interface/TupleMaker_PFMet.h"
+#include "HGCalAnalysis/HGCalTreeMaker/interface/TupleMaker_PFJets.h"
+#include "HGCalAnalysis/HGCalTreeMaker/interface/TupleMaker_GenMet.h"
+#include "HGCalAnalysis/HGCalTreeMaker/interface/TupleMaker_GenJets.h"
 
 DEFINE_FWK_MODULE(HGCalTupleMaker_Tree);
 DEFINE_FWK_MODULE(HGCalTupleMaker_Event);
@@ -26,3 +31,8 @@ DEFINE_FWK_MODULE(HGCalTupleMaker_HGCSimHits);
 DEFINE_FWK_MODULE(HGCalTupleMaker_SimTracks);
 DEFINE_FWK_MODULE(HGCalTupleMaker_RecoTracks);
 DEFINE_FWK_MODULE(TupleMaker_PFCandidates);
+DEFINE_FWK_MODULE(TupleMaker_PFCluster);
+DEFINE_FWK_MODULE(TupleMaker_PFMet);
+DEFINE_FWK_MODULE(TupleMaker_PFJets);
+DEFINE_FWK_MODULE(TupleMaker_GenMet);
+DEFINE_FWK_MODULE(TupleMaker_GenJets);

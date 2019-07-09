@@ -37,6 +37,8 @@
 #include <iomanip> // for setw()
 #include <algorithm> 
 
+#include "../include/fReader.h" // Read from TTRee
+
 #include "TROOT.h"
 #include "TF1.h"
 #include "TMath.h"
@@ -73,13 +75,38 @@
 #endif
 
 using namespace std;
+using namespace globalTChain;
 
 bool DRAWPLOTS  = false;  // draw plots or not (make "Fig" directory first before turning this on)
 bool VERBOSE    = false;  // print out mean +/- sigma for each channel or not
 
+// Assemble a list of inputfiles
+
+std::vector<std::string> GetInputFiles(TString geoConfig)
+{
+  int numFiles = 20;
+  std::string path = "/cms/data/store/user/bcaraway/condor/outputs/";
+  std::string startName = "ttbar_10_4_";
+  std::string midName = "_pt25_numEvent1000_CMSSW_10_4_0_pre2_";
+  std::string endName = "_v01.root";
+  std::vector<std::string> inputFiles;
+  
+  for( int iFile = 0 ; iFile<numFiles ; iFile++ )
+    {
+      std::ostringstream fileName;
+      fileName << path << startName << geoConfig << midName << iFile << endName;
+      inputFiles.push_back(fileName.str());
+     
+    }
+
+  return inputFiles;
+
+}
+
 //
 // Book histograms
 //
+
 void book1D(TList *v_hist, std::string name, int n, double min, double max);
 void book1DProf(TList *v_hist, std::string name, int n, double min, double max, double ymin, double ymax, Option_t *option);
 
@@ -91,6 +118,7 @@ void bookHistograms(TList *v_hist);
 // Fill histograms
 //
 void fill1D(TList *v_hist, std::string name, double value);
+void fill1D(TList *v_hist, std::string name, double value, double valuey);
 void fill1DProf(TList *v_hist, std::string name, double value, double valuey);
 
 void fill2D(TList *v_hist, std::string name, double valuex, double valuey);  // added by Bryan 
@@ -103,7 +131,7 @@ void relabel2D   (TList *v_hist, std::string name); // added by Bryan
 //
 // Main analyzer
 //
-void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=2) 
+void PFCheckRun(std::vector<std::string> inputFiles, TString outfile, int maxevents, int option=2) 
 { 
 
    cout << "[PF analyzer] Running option " << option << " for " << endl; 
@@ -116,117 +144,37 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
    //
    TChain *ch = new TChain("hgcalTupleTree/tree");
 
-   std::string filename(rootfile);
-   std::string::size_type idx;
-   idx = filename.rfind('.');
-   std::string extension = filename.substr(idx+1);
-   std::string line;
+   //std::string filename(rootfile);
+   //std::string::size_type idx;
+   //idx = filename.rfind('.');
+   //std::string extension = filename.substr(idx+1);
+   //std::string line;
    
-   if(idx != std::string::npos && extension=="txt")
-     {
-       std::cout << rootfile << " " << extension << std::endl;
-       std::ifstream in(rootfile);
-       while (std::getline(in, line)) {     // Process line
-	 if (line.size()>0) ch->Add(line.c_str());
-       }
-     }
-   else
-     {
-       // No extension found
-       ch->Add(rootfile);
-     }
+   //if(idx != std::string::npos && extension=="txt")
+   //  {
+   //    std::cout << rootfile << " " << extension << std::endl;
+   //    std::ifstream in(rootfile);
+   //    while (std::getline(in, line)) {     // Process line
+   //	 if (line.size()>0) ch->Add(line.c_str());
+   //    }
+   //  }
+   //else
+   //  {
+   //    // No extension found
+   //    ch->Add(rootfile);
+   //  }
+
+
+   for (unsigned int iFile=0; iFile<inputFiles.size(); ++iFile) {
+    ch->Add(inputFiles[iFile].c_str());
+    std::cout<<inputFiles[iFile]<<std::endl;
+   }
 
    printf("%d;\n",ch->GetNtrees());
    printf("%lld;\n",ch->GetEntries());
+   
 
-   TTreeReader     fReader(ch);  //!the tree reader
-
-   //
-   // Set up TTreeReader's
-   // -- use MakeSelector of root
-   //
-   // Readers to access the data (delete the ones you do not need).
-
-   TTreeReaderArray<double> GenParEta = {fReader, "GenParEta"};
-   TTreeReaderArray<double> GenParM = {fReader, "GenParM"};
-   TTreeReaderArray<double> GenParPhi = {fReader, "GenParPhi"};
-   TTreeReaderArray<double> GenParPt = {fReader, "GenParPt"};
-   TTreeReaderArray<double> GeneralTracksD0 = {fReader, "GeneralTracksD0"};
-   TTreeReaderArray<double> GeneralTracksDZ = {fReader, "GeneralTracksDZ"};
-   TTreeReaderArray<double> GeneralTracksEta = {fReader, "GeneralTracksEta"};
-   TTreeReaderArray<double> GeneralTracksPhi = {fReader, "GeneralTracksPhi"};
-   TTreeReaderArray<double> GeneralTracksPt = {fReader, "GeneralTracksPt"};
-   TTreeReaderArray<double> PFParEta = {fReader, "PFParEta"};
-   TTreeReaderArray<double> PFParM = {fReader, "PFParM"};
-   TTreeReaderArray<double> PFParPhi = {fReader, "PFParPhi"};
-   TTreeReaderArray<double> PFParPt = {fReader, "PFParPt"};
-   /*
-   TTreeReaderArray<float> HBHERecHitEnergy = {fReader, "HBHERecHitEnergy"};
-   TTreeReaderArray<float> HBHERecHitEta = {fReader, "HBHERecHitEta"};
-   TTreeReaderArray<float> HBHERecHitPhi = {fReader, "HBHERecHitPhi"};
-   TTreeReaderArray<float> HBHERecHitTime = {fReader, "HBHERecHitTime"};
-   TTreeReaderArray<float> HGCRecHitEnergy = {fReader, "HGCRecHitEnergy"};
-   TTreeReaderArray<float> HGCRecHitEta = {fReader, "HGCRecHitEta"};
-   TTreeReaderArray<float> HGCRecHitPhi = {fReader, "HGCRecHitPhi"};
-   TTreeReaderArray<float> HGCRecHitPosx = {fReader, "HGCRecHitPosx"};
-   TTreeReaderArray<float> HGCRecHitPosy = {fReader, "HGCRecHitPosy"};
-   TTreeReaderArray<float> HGCRecHitPosz = {fReader, "HGCRecHitPosz"};
-   TTreeReaderArray<float> HGCSimHitsEnergy = {fReader, "HGCSimHitsEnergy"};
-   TTreeReaderArray<float> HGCSimHitsEta = {fReader, "HGCSimHitsEta"};
-   TTreeReaderArray<float> HGCSimHitsPhi = {fReader, "HGCSimHitsPhi"};
-   TTreeReaderArray<float> HGCSimHitsPosx = {fReader, "HGCSimHitsPosx"};
-   TTreeReaderArray<float> HGCSimHitsPosy = {fReader, "HGCSimHitsPosy"};
-   TTreeReaderArray<float> HGCSimHitsPosz = {fReader, "HGCSimHitsPosz"};
-   TTreeReaderArray<float> HGCSimHitsTime = {fReader, "HGCSimHitsTime"};
-   TTreeReaderArray<float> SimTracksEta = {fReader, "SimTracksEta"};
-   TTreeReaderArray<float> SimTracksPhi = {fReader, "SimTracksPhi"};
-   TTreeReaderArray<float> SimTracksPt = {fReader, "SimTracksPt"};
-   TTreeReaderArray<float> SimTracksR = {fReader, "SimTracksR"};
-   TTreeReaderArray<float> SimTracksZ = {fReader, "SimTracksZ"};
-   */
-   TTreeReaderArray<float> PFParEcalEnergyFrac = {fReader, "PFParEcalEnergyFrac"};
-   TTreeReaderArray<float> PFParHOEnergyFrac = {fReader, "PFParHOEnergyFrac"};
-   TTreeReaderArray<float> PFParHcalEnergyFrac = {fReader, "PFParHcalEnergyFrac"};
-   TTreeReaderArray<float> PFParHcalFrac1 = {fReader, "PFParHcalFrac1"};
-   TTreeReaderArray<float> PFParHcalFrac2 = {fReader, "PFParHcalFrac2"};
-   TTreeReaderArray<float> PFParHcalFrac3 = {fReader, "PFParHcalFrac3"};
-   TTreeReaderArray<float> PFParHcalFrac4 = {fReader, "PFParHcalFrac4"};
-   TTreeReaderArray<float> PFParHcalFrac5 = {fReader, "PFParHcalFrac5"};
-   TTreeReaderArray<float> PFParHcalFrac6 = {fReader, "PFParHcalFrac6"};
-   TTreeReaderArray<float> PFParHcalFrac7 = {fReader, "PFParHcalFrac7"};
-   TTreeReaderArray<float> PFParTrackPt = {fReader, "PFParTrackPt"};
-   TTreeReaderArray<int> GenParPdgId = {fReader, "GenParPdgId"};
-   TTreeReaderArray<int> GenParStatus = {fReader, "GenParStatus"};
-   TTreeReaderArray<int> GeneralTracksNValidHits = {fReader, "GeneralTracksNValidHits"};
-   /*
-   TTreeReaderArray<int> HBHERecHitAux = {fReader, "HBHERecHitAux"};
-   TTreeReaderArray<int> HBHERecHitDepth = {fReader, "HBHERecHitDepth"};
-   TTreeReaderArray<int> HBHERecHitFlags = {fReader, "HBHERecHitFlags"};
-   TTreeReaderArray<int> HBHERecHitHPDid = {fReader, "HBHERecHitHPDid"};
-   TTreeReaderArray<int> HBHERecHitIEta = {fReader, "HBHERecHitIEta"};
-   TTreeReaderArray<int> HBHERecHitIPhi = {fReader, "HBHERecHitIPhi"};
-   TTreeReaderArray<int> HBHERecHitRBXid = {fReader, "HBHERecHitRBXid"};
-   TTreeReaderArray<int> HGCRecHitIndex = {fReader, "HGCRecHitIndex"};
-   TTreeReaderArray<int> HGCRecHitLayer = {fReader, "HGCRecHitLayer"};
-   TTreeReaderArray<int> HGCSimHitsCellU = {fReader, "HGCSimHitsCellU"};
-   TTreeReaderArray<int> HGCSimHitsCellV = {fReader, "HGCSimHitsCellV"};
-   TTreeReaderArray<int> HGCSimHitsIEta = {fReader, "HGCSimHitsIEta"};
-   TTreeReaderArray<int> HGCSimHitsIPhi = {fReader, "HGCSimHitsIPhi"};
-   TTreeReaderArray<int> HGCSimHitsIndex = {fReader, "HGCSimHitsIndex"};
-   TTreeReaderArray<int> HGCSimHitsLayer = {fReader, "HGCSimHitsLayer"};
-   TTreeReaderArray<int> HGCSimHitsSubdet = {fReader, "HGCSimHitsSubdet"};
-   TTreeReaderArray<int> HGCSimHitsWaferU = {fReader, "HGCSimHitsWaferU"};
-   TTreeReaderArray<int> HGCSimHitsWaferV = {fReader, "HGCSimHitsWaferV"};
-   TTreeReaderArray<int> SimTracksCharge = {fReader, "SimTracksCharge"};
-   TTreeReaderArray<int> SimTracksPID = {fReader, "SimTracksPID"};
-   */
-   TTreeReaderArray<int> PFParPdgId = {fReader, "PFParPdgId"};
-   TTreeReaderArray<int> PFParStatus = {fReader, "PFParStatus"};
-   TTreeReaderValue<UInt_t> bx = {fReader, "bx"};
-   TTreeReaderValue<UInt_t> event = {fReader, "event"};
-   TTreeReaderValue<UInt_t> ls = {fReader, "ls"};
-   TTreeReaderValue<UInt_t> orbit = {fReader, "orbit"};
-   TTreeReaderValue<UInt_t> run = {fReader, "run"};
+   fReader.SetTree(ch);  //the tree reader (Defined in fReader.h)
 
    //
    // Define histograms to fill
@@ -242,8 +190,9 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
    cout << "[HGCal analyzer] The number of entries is: " << nentries << endl;
 
    bool debug=false;
-   bool debug_met =true;
-   
+   bool debug_met =false;
+   bool print_prev = false;
+
    //---------------------------------------------------------------------------------------------------------
    // main event loop
    //---------------------------------------------------------------------------------------------------------
@@ -251,13 +200,20 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
    TLorentzVector tlzv;      // for MET
    TLorentzVector tlzv_temp; // for MET
    
+   std::map<int, TLorentzVector> pfpar_tlzv;
+   std::map<int, TString>        pfpar_type;
+   pfpar_type[1] = "chargedHadron"; pfpar_type[2] = "electron"; pfpar_type[3] = "muon";
+   pfpar_type[4] = "photon"; pfpar_type[5] = "neutralHadron"; pfpar_type[6] = "HFHadron";
+   pfpar_type[7] = "HFPhoton";
+   								  
+   
    int ievent=0;
    while (fReader.Next()) {
   
      // Progress indicator 
      ievent++;
-     if(ievent%100==0) cout << "[HCAL analyzer] Processed " << ievent << " out of " << nentries << " events" << endl; 
-     if (maxevents>0 && ievent>maxevents) break;
+     if(ievent%1000==0) cout << "[HCAL analyzer] Processed " << ievent << " out of " << nentries << " events" << endl; 
+     if (maxevents>0 && ievent>maxevents) Break;
      
      //--------------------
      // Loop over PF candidates
@@ -265,8 +221,14 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
      
      tlzv.SetPtEtaPhiM(0.0,0.0,0.0,0.0);       // for MET
      tlzv_temp.SetPtEtaPhiM(0.0,0.0,0.0,0.0);  // for MET
-     
+     for (int i = 1; i <= 7 ; i++){            // for summing pt of respective pfparticle
+       pfpar_tlzv[i].SetPtEtaPhiM(0.0,0.0,0.0,0.0); 
+     }
+     double delta_phi = 2*TMath::Pi();
+     double delta_eta = 0.1;
+
      double PFMass = 0; // for hardcoded mass in GeV, PFM suffers from a rounding error.     
+     
 
      // Begin Loop
      for (int ipfcand = 0, npfcand =  PFParPt.GetSize(); ipfcand < npfcand; ++ipfcand) {
@@ -284,406 +246,361 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
        if (PFParPdgId[ipfcand] == 6) PFMass = .13957 ; // HF Hadron --> Pion
        if (PFParPdgId[ipfcand] == 7) PFMass = 0. ; // HF EM Particle --> Photon
 	 
+       tlzv_temp.SetPtEtaPhiM(PFParPt[ipfcand],PFParEta[ipfcand],PFParPhi[ipfcand],PFMass);
        std::string strtmp;
 
-       strtmp = "PFTask_hcalFrac1Zero_vs_pt";
-       float zero1=0.;
-       if (PFParHcalFrac1[ipfcand]==0.) zero1=1.; 
-       fill1DProf(v_hist, strtmp, log10(PFParPt[ipfcand]),zero1);
-
-       strtmp = "PFTask_hcalFrac2Zero_vs_pt";
-       float zero2=0.;
-       if (PFParHcalFrac2[ipfcand]==0.) zero2=1.; 
-       fill1DProf(v_hist, strtmp, log10(PFParPt[ipfcand]),zero2);
-
-       strtmp = "PFTask_hcalFrac3Zero_vs_pt";
-       float zero3=0.;
-       if (PFParHcalFrac3[ipfcand]==0.) zero3=1.; 
-       fill1DProf(v_hist, strtmp, log10(PFParPt[ipfcand]),zero3);
-
-       strtmp = "PFTask_hcalFrac4Zero_vs_pt";
-       float zero4=0.;
-       if (PFParHcalFrac4[ipfcand]==0.) zero4=1.; 
-       fill1DProf(v_hist, strtmp, log10(PFParPt[ipfcand]),zero4);
-
-       strtmp = "PFTask_hcalFrac5Zero_vs_pt";
-       float zero5=0.;
-       if (PFParHcalFrac5[ipfcand]==0.) zero5=1.; 
-       fill1DProf(v_hist, strtmp, log10(PFParPt[ipfcand]),zero5);
-
-       strtmp = "PFTask_hcalFrac6Zero_vs_pt";
-       float zero6=0.;
-       if (PFParHcalFrac6[ipfcand]==0.) zero6=1.;
-       fill1DProf(v_hist, strtmp, log10(PFParPt[ipfcand]),zero6);
-
-       strtmp = "PFTask_hcalFrac7Zero_vs_pt";
-       float zero7=0.;
-       if (PFParHcalFrac7[ipfcand]==0.) zero7=1.; 
-       fill1DProf(v_hist, strtmp, log10(PFParPt[ipfcand]),zero7);
-
-       strtmp = "PFTask_hcalFracAllZero_vs_pt";
-       float zeroAll=0.;
-       if (PFParHcalFrac1[ipfcand]==0.
-	   && PFParHcalFrac2[ipfcand]==0. 
-	   && PFParHcalFrac3[ipfcand]==0. 
-	   && PFParHcalFrac4[ipfcand]==0. 
-	   && PFParHcalFrac5[ipfcand]==0. 
-	   && PFParHcalFrac6[ipfcand]==0. 
-	   && PFParHcalFrac7[ipfcand]==0.) zeroAll=1.; 
-       fill1DProf(v_hist, strtmp, log10(PFParPt[ipfcand]), zeroAll);
+       pfpar_tlzv[PFParPdgId[ipfcand]] += tlzv_temp;
+       ///=================================PT vs Eta======================
+       
+       fill1D(v_hist, static_cast<std::string>("PFPt_Eta_"+pfpar_type[PFParPdgId[ipfcand]]), tlzv_temp.Eta(), tlzv_temp.Pt()/(nentries*delta_phi*delta_eta));
+       
        ////
        //// Bryan's studies
        ////
        strtmp = "PFTask_PdgId_vs_pt";  
-       fill2D(v_hist, strtmp, PFParPdgId[ipfcand] , PFParPt[ipfcand]);
-       
+       fill2D(v_hist, strtmp, PFParPdgId[ipfcand] , PFParPt[ipfcand]);       
        // Plotting PF eta
        strtmp = "PFTask_PFEta_All";
        fill1D(v_hist, strtmp, PFParEta[ipfcand]);
-       
        if (PFParPdgId[ipfcand] == 1){  // for Charged Hadron
 	 strtmp = "PFTask_PFEta_ChargedHadron";
 	 fill1D(v_hist, strtmp, PFParEta[ipfcand]);
        }
-
        if (PFParPdgId[ipfcand] == 5){  // for Neutral Hadron
 	 strtmp = "PFTask_PFEta_NeutralHadron";
 	 fill1D(v_hist, strtmp, PFParEta[ipfcand]);
        }
-
        if (PFParPdgId[ipfcand] == 2){  // for Electron
 	 strtmp = "PFTask_PFEta_Electron";
 	 fill1D(v_hist, strtmp, PFParEta[ipfcand]);
        }
-
+       if (PFParPdgId[ipfcand] == 3){  // for Muon
+	 strtmp = "PFTask_PFEta_Muon";
+	 fill1D(v_hist, strtmp, PFParEta[ipfcand]);
+       }
        if (PFParPdgId[ipfcand] == 4){  // for Photon
 	 strtmp = "PFTask_PFEta_Photon";
 	 fill1D(v_hist, strtmp, PFParEta[ipfcand]);
        }
-
-       if (PFParPdgId[ipfcand] == 6) { // testing other pfcand in vector
-	 strtmp = "PFTask_PFEta_testPhoton";
+       if (PFParPdgId[ipfcand] == 6) { // for HF Hadron
+	 strtmp = "PFTask_PFEta_HF_Hadron";
 	 fill1D(v_hist, strtmp, PFParEta[ipfcand]);
        }
-       
-       if (PFParPdgId[ipfcand] == 7) { // testing other pfcand in vector
-	 strtmp = "PFTask_PFEta_testHadron";
+       if (PFParPdgId[ipfcand] == 7) { // for HF Photon
+	 strtmp = "PFTask_PFEta_HF_Photon";
 	 fill1D(v_hist, strtmp, PFParEta[ipfcand]);
        }
-       
        ///
        /// Adding up for MET
        ///
-      
+       
        
        if (debug_met){
-	 std::cout << "Pt: " << PFParPt[ipfcand] << ", Eta: " << PFParEta[ipfcand] << ", Phi: " << PFParPhi[ipfcand] << ", Mass: " << PFMass << std::endl;
-	 
+	 std::cout << "Pt: " << PFParPt[ipfcand] << ", Eta: " << PFParEta[ipfcand] << ", Phi: " << PFParPhi[ipfcand] << ", Mass: " << PFMass << std::endl;	 
        }
        tlzv_temp.SetPtEtaPhiM(PFParPt[ipfcand],PFParEta[ipfcand],PFParPhi[ipfcand],PFMass);
        tlzv += tlzv_temp;
        
-       //
-       // Endcap
-       // 
-       if ( fabs(PFParEta[ipfcand])<2.9&&fabs(PFParEta[ipfcand])>1.5){
-	 //
-	 // http://cmslxr.fnal.gov/source/DataFormats/ParticleFlowCandidate/interface/PFCandidate.h
-	 //
-	 // Charged hadrons
-	 //
-	 if ( PFParPdgId[ipfcand]==1 && fabs(PFParEta[ipfcand])<2.5 ){ 
-	   if ( PFParPt[ipfcand]>5.){
 
-	     if (debug) {
-	     std::cout << PFParPt[ipfcand] << " " << PFParEta[ipfcand] << " " << PFParPdgId[ipfcand] << std::endl;
-	     std::cout << PFParTrackPt[ipfcand] << " " << PFParEcalEnergyFrac[ipfcand] << " "
-		       << PFParHcalEnergyFrac[ipfcand] << " " << PFParHOEnergyFrac[ipfcand] << std::endl;
-	     std::cout << PFParHcalFrac1[ipfcand] << " "
-		       << PFParHcalFrac2[ipfcand] << " " 
-		       << PFParHcalFrac3[ipfcand] << " " 
-		       << PFParHcalFrac4[ipfcand] << " " 
-		       << PFParHcalFrac5[ipfcand] << " " 
-		       << PFParHcalFrac6[ipfcand] << " " 
-		       << PFParHcalFrac7[ipfcand] << std::endl;
-	     std::cout << std::endl;
-	     }
-	   }
-	   //--- 
-	   if ( PFParPt[ipfcand]>5. ){
-	     strtmp = "PFTask_Profile_ChargedHadron_Endcap_PtAbove5";
-	     fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-
-	     if (debug) {	     
-	     std::cout << PFParPt[ipfcand] << " " << PFParEta[ipfcand] << " " << PFParPdgId[ipfcand] << std::endl;	   
-	     std::cout << PFParTrackPt[ipfcand] << " " << PFParEcalEnergyFrac[ipfcand] << " "
-		       << PFParHcalEnergyFrac[ipfcand] << " " << PFParHOEnergyFrac[ipfcand] << std::endl;
-	     std::cout << PFParHcalFrac1[ipfcand] << " "
-		       << PFParHcalFrac2[ipfcand] << " " 
-		       << PFParHcalFrac3[ipfcand] << " " 
-		       << PFParHcalFrac4[ipfcand] << " " 
-		       << PFParHcalFrac5[ipfcand] << " " 
-		       << PFParHcalFrac6[ipfcand] << " " 
-		     << PFParHcalFrac7[ipfcand] << std::endl;
-	     std::cout << std::endl;
-	     }
-	     
-	     strtmp = "PFTask_ChargedHadron_TrackPtRatio_PtAbove5";
-	     fill1D(v_hist, strtmp, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-
-	     if (PFParTrackPt[ipfcand]!=PFParPt[ipfcand]){
-	       strtmp = "PFTask_Profile_ChargedHadron_Endcap_PtAbove5_Special";
-	       fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	       fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	       fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-	     }
-
-	   } else if ( PFParPt[ipfcand]>1.){
-	     
-	     strtmp = "PFTask_Profile_ChargedHadron_Endcap_Pt1To5";
-	     fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-
-	     strtmp = "PFTask_ChargedHadron_TrackPtRatio_Pt1To5";
-	     fill1D(v_hist, strtmp, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	     
-	     if (PFParTrackPt[ipfcand]!=PFParPt[ipfcand]){
-	       strtmp = "PFTask_Profile_ChargedHadron_Endcap_Pt1To5_Special";
-	       fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	       fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	       fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-	     }
-
-	   } else {
-	     
-	     strtmp = "PFTask_Profile_ChargedHadron_Endcap_PtBelow1";
-	     fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-	     
-	     strtmp = "PFTask_ChargedHadron_TrackPtRatio_PtBelow1";
-	     fill1D(v_hist, strtmp, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-
-	     if (PFParTrackPt[ipfcand]!=PFParPt[ipfcand]){
-	       strtmp = "PFTask_Profile_ChargedHadron_Endcap_PtBelow1_Special";
-	       fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	       fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	       fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	       fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-	     }
-
-	   }
-	   
-	 //
-	 // Neutral hadrons
-	 //
-	   
-	 } else if ( PFParPdgId[ipfcand]==5 ){
-	   if ( PFParPt[ipfcand]>5.){
-	     strtmp = "PFTask_hcalProfile_NeutralHadron_Endcap_PtAbove5";
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-
-	     /*
-	     std::cout << PFParPt[ipfcand] << " " << PFParEta[ipfcand] << " " << PFParPdgId[ipfcand] << std::endl;	   
-	     std::cout << PFParTrackPt[ipfcand] << " " << PFParEcalEnergyFrac[ipfcand] << " "
-		       << PFParHcalEnergyFrac[ipfcand] << " " << PFParHOEnergyFrac[ipfcand] << std::endl;
-	     std::cout << PFParHcalFrac1[ipfcand] << " "
-		       << PFParHcalFrac2[ipfcand] << " " 
-		       << PFParHcalFrac3[ipfcand] << " " 
-		       << PFParHcalFrac4[ipfcand] << " " 
-		       << PFParHcalFrac5[ipfcand] << " " 
-		       << PFParHcalFrac6[ipfcand] << " " 
-		     << PFParHcalFrac7[ipfcand] << std::endl;
-	     std::cout << std::endl;
-	     */
-
-	   } else if ( PFParPt[ipfcand]>1.){
-	     
-	     strtmp = "PFTask_hcalProfile_NeutralHadron_Endcap_Pt1To5";
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-
-	   } else {
-	     
-	     strtmp = "PFTask_hcalProfile_NeutralHadron_Endcap_PtBelow1";
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-	     
-	   }
-	   
-	 //
-	 // PF electrons
-	 //
-
-	 } else if ( PFParPdgId[ipfcand]==2 ){
-	   if ( PFParPt[ipfcand]>5.){
-	     strtmp = "PFTask_Profile_PFElectron_Endcap_PtAbove5";
-	     fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-	     	     
-	   } else if ( PFParPt[ipfcand]>1.){
-	     
-	     strtmp = "PFTask_Profile_PFElectron_Endcap_Pt1To5";
-	     fill1DProf(v_hist, strtmp, -3.,PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-
-	   } else {
-	     strtmp = "PFTask_Profile_PFElectron_Endcap_PtBelow1";
-	     fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-	     
-	   }
-	 //
-	 // PF photons
-	 //
-	  
-	 } else if ( PFParPdgId[ipfcand]==4 ){
-	   if ( PFParPt[ipfcand]>5.){
-	     strtmp = "PFTask_Profile_PFPhoton_Endcap_PtAbove5";
-	     fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-	     
-	   } else if ( PFParPt[ipfcand]>1.){
-	     
-	     strtmp = "PFTask_Profile_PFPhoton_Endcap_Pt1To5";
-	     fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-
-	   } else {
-	     
-	     strtmp = "PFTask_Profile_PFPhoton_Endcap_PtBelow1";
-	     fill1DProf(v_hist, strtmp, -3, PFParTrackPt[ipfcand]/PFParPt[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -2, PFParEcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, -1, PFParHcalEnergyFrac[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 1., PFParHcalFrac1[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 2., PFParHcalFrac2[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 3., PFParHcalFrac3[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 4., PFParHcalFrac4[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 5., PFParHcalFrac5[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 6., PFParHcalFrac6[ipfcand]);
-	     fill1DProf(v_hist, strtmp, 7., PFParHcalFrac7[ipfcand]);
-	     
-	   }
-	   
-	 } // PF photons
-       
-       } // Endcap
-            
      } // PF candidiate loop
-     
-     if  (debug_met){
-       std::cout << "MET: "<<tlzv.Pt()<<std::endl;
+     for (int i = 1; i <= 7 ; i++){
+       fill1D(v_hist, static_cast<std::string>("PFPtvsEta_"+pfpar_type[i]),  pfpar_tlzv[i].Eta(),  pfpar_tlzv[i].Pt()/(nentries*delta_phi*delta_eta));
      }
-     fill1D(v_hist, "PFTask_MET", tlzv.Et());  // for MET
+     // catagorize the event by gen particle makeup
+     int n_neutral_gen = 0;
+     int ngen = GenParPdgId.GetSize();
+     for (int igen = 0; igen<ngen; igen++){
+       if (GenParPdgId[igen] == 130 || GenParPdgId[igen] == 111 || GenParPdgId[igen] == 310) n_neutral_gen++; // counts neutral particles 
+     }
+     double gen_ratio = static_cast<double>(n_neutral_gen)/static_cast<double>(ngen);// std::cout<<gen_ratio<<"\t"<<n_neutral_gen<<"\t"<<ngen<<std::endl;
+     fill1D(v_hist, "Neutral_Gen_Particles",n_neutral_gen);
+     fill1D(v_hist, "Neutral_Gen_Ratio",gen_ratio);
 
+     bool debug_met_V2    = false; 
+     //=========ONLY SET ONE TO "TRUE"================
+     bool low_GenMET        = false; // set to true if doing low Gen study
+     bool jet_at_boundary   = false; // set to true if doing at least one jet at HGCal boundary study
+     bool norm_jet          = true; // no constaints 
+     bool large_neutral     = false; // jet makeup consists of a large amount of neutral hadrons/Em
+     bool gen_neutral_ratio = false;  // gen particle ratio consists of a noticable amount of neutral particls
+     //===============================================
+
+     //if  (tlzv.Pt() > 200 && debug_met_V2){
+     //  std::cout << "MET: "<<tlzv.Pt()<<std::endl;
+     //}
+     fill1D(v_hist, "PFTask_MET", tlzv.Pt());  // for MET
+     
+     fill1D(v_hist, "PFParMET", PFParMET[0]);     // MET calculated before ntuple step
+     //fill1D(v_hist, "PFMET"   , PFMET[0]   );     //  MET
+     fill1D(v_hist, "GenMET"  , GenMET[0]  );     // Gen MET
+     
+     if (GenMET[0] < 10 && low_GenMET) {
+       fill1D(v_hist, "PFMET", PFMET[0]   ); // exclude events where met is largely due to neutrinos 
+     }
+
+     if (tlzv.Pt() - PFMET[0] > abs(5.)){ 
+       std::cout << "\nCalculated MET:\t\t " << tlzv.Pt() <<"\nCalculated before ntuple MET:\t " <<PFParMET[0] << "\nTrue MET:\t\t "<<PFMET[0]<<std::endl;
+     }
+     ///
+     /// DEBUG MET
+     ///
+     
+     if ((GenMET[0]< 10 && PFMET[0] > 200) && debug_met_V2){
+       
+       tlzv.SetPtEtaPhiM(0.0,0.0,0.0,0.0);       // for MET
+       tlzv_temp.SetPtEtaPhiM(0.0,0.0,0.0,0.0);  // for MET
+
+       for (int ipfcand = 0, npfcand =  PFParPt.GetSize(); ipfcand < npfcand; ++ipfcand) {
+	 
+	 if (PFParPdgId[ipfcand] == 1) PFMass = .13957 ; // charged hadron --> Pion
+	 if (PFParPdgId[ipfcand] == 2) PFMass = .000511 ; // electron
+	 if (PFParPdgId[ipfcand] == 3) PFMass = .1057 ; // muon
+	 if (PFParPdgId[ipfcand] == 4) PFMass = 0. ; // photon
+	 if (PFParPdgId[ipfcand] == 5) PFMass = .49761 ; // neutral hadron --> K0L
+	 if (PFParPdgId[ipfcand] == 6) PFMass = .13957 ; // HF Hadron --> Pion
+	 if (PFParPdgId[ipfcand] == 7) PFMass = 0. ; // HF EM Particle --> Photon
+
+	 tlzv_temp.SetPtEtaPhiM(PFParPt[ipfcand],PFParEta[ipfcand],PFParPhi[ipfcand],PFMass);
+	 tlzv += tlzv_temp;
+	 
+	 if (PFParPt[ipfcand] > 10){
+	   std::cout << "PFID: "<< PFParPdgId[ipfcand] << ", Pt: " << PFParPt[ipfcand] << ", Eta: " << PFParEta[ipfcand] << ", Phi: " << PFParPhi[ipfcand] << ", Mass: " << PFMass << std::endl;
+	   //std::cout<< "Summed PT: " << tlzv.Pt() << std::endl;
+	 }
+       }
+     }
+
+     ///
+     /// END DEBUG MET
+     ///
+
+     ///
+     /// Gen Jet and PF Jet analysis
+     ///
+     bool boundary_eta = false;
+     int gen_boundary_jets = 0;
+     TLorentzVector genJet_tlzv; genJet_tlzv.SetPtEtaPhiE(0.,0.,0.,0.);
+     std::vector<TLorentzVector> tlzv_vec;
+     TLorentzVector genJet_tlzv_hcal; genJet_tlzv.SetPtEtaPhiE(0.,0.,0.,0.);
+     std::vector<TLorentzVector> tlzv_vec_hcal;
+     TLorentzVector genJet_tlzv_base; genJet_tlzv.SetPtEtaPhiE(0.,0.,0.,0.);
+     std::vector<TLorentzVector> tlzv_vec_base;
+     // Gen
+     tlzv.SetPtEtaPhiE(0.0,0.0,0.0,0.0);       // for MET                                                                                                 
+     tlzv_temp.SetPtEtaPhiE(0.0,0.0,0.0,0.0);  // for MET   
+
+     for (int ijet = 0, njet = GenJetsPt.GetSize(); ijet < njet; ++ijet) {      
+       tlzv_temp.SetPtEtaPhiE(GenJetsPt[ijet],GenJetsEta[ijet],GenJetsPhi[ijet],GenJetsEnergy[ijet]);
+       tlzv += tlzv_temp;
+       fill1D(v_hist,"GenJetEta",GenJetsEta[ijet]);
+       double absJetEta = abs(GenJetsEta[ijet]);
+       if ((absJetEta <= 3.10 && absJetEta > 2.80) && GenJetsPt[ijet] >= 20){// || (absJetEta < 1.6 && absJetEta >= 1.4)){
+	 gen_boundary_jets++;
+	 boundary_eta = true;
+	 genJet_tlzv = tlzv_temp;
+	 tlzv_vec.push_back(genJet_tlzv);
+       }
+       if ((absJetEta <= 1.60 && absJetEta > 1.40) && GenJetsPt[ijet] >= 20){// || (absJetEta < 1.6 && absJetEta >= 1.4)){
+	 boundary_eta = true;
+	 genJet_tlzv_hcal = tlzv_temp;
+	 tlzv_vec_hcal.push_back(genJet_tlzv_hcal);
+       }
+       if ((absJetEta <= 2.80 && absJetEta > 2.40) && GenJetsPt[ijet] >= 20){// || (absJetEta < 1.6 && absJetEta >= 1.4)){
+	 boundary_eta = true;
+	 genJet_tlzv_base = tlzv_temp;
+	 tlzv_vec_base.push_back(genJet_tlzv_base);
+       }
+     }
+     //if (boundary_eta == true) std::cout<<"Gen jets at boundary:\t\t"<<gen_boundary_jets<<std::endl;
+     fill1D(v_hist,"GenJetMET",tlzv.Pt());
+
+     // PF
+
+    
+     bool neutral_event = false; 
+     int n_jets_eta = 0;
+     int n_neutral_jets = 0;
+
+     tlzv.SetPtEtaPhiE(0.0,0.0,0.0,0.0);       // for MET                                                                                                 
+     tlzv_temp.SetPtEtaPhiE(0.0,0.0,0.0,0.0);  // for MET   
+     
+     for (int ijet = 0, njet = PFJetsPt.GetSize(); ijet < njet; ++ijet) {
+      
+       tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet],PFJetsEta[ijet],PFJetsPhi[ijet],PFJetsEnergy[ijet]);
+       tlzv += tlzv_temp;
+       
+       if (norm_jet) fill1D(v_hist,"PFJetEta",PFJetsEta[ijet]);
+       
+       fill1D(v_hist,"PFJetHFEMEFraction",PFJetsrecoJetsHFEMEnergyFraction[ijet]);
+       fill1D(v_hist,"PFJetchargedHFHadronEFraction" ,PFJetsrecoJetsHFHadronEnergyFraction[ijet]);
+       fill1D(v_hist,"PFJetchargedEMEFraction" ,PFJetsrecoJetschargedEmEnergyfraction[ijet]);
+       fill1D(v_hist,"PFJetchargedHadronEFraction" ,PFJetsrecoJetschargedHadronEnergyFraction[ijet]);
+       fill1D(v_hist,"PFJetMuonEFraction" ,PFJetsrecoJetsmuonEnergyFraction[ijet]);
+       fill1D(v_hist,"PFJetneutralEMEFraction" ,PFJetsrecoJetsneutralEmEnergyFraction[ijet]);
+       fill1D(v_hist,"PFJetneutralEFraction" ,PFJetsrecoJetsneutralEnergyFraction[ijet]);
+       
+       double absJetEta = abs(PFJetsEta[ijet]);
+
+       if ((absJetEta <= 3.0 && absJetEta > 2.8) || (absJetEta < 1.6 && absJetEta >= 1.4)){
+	 //boundary_eta = true;
+	 n_jets_eta++ ;
+       }
+     
+       
+       if ((PFJetsrecoJetsneutralEnergyFraction[ijet] + PFJetsrecoJetsneutralEmEnergyFraction[ijet]) > .30) n_neutral_jets++;
+       //if (gen_ratio > .09) fill1D(v_hist,"PFtotalneutralEFraction", PFJetsrecoJetsneutralEnergyFraction[ijet] + PFJetsrecoJetsneutralEmEnergyFraction[ijet]);
+     }	 
+     
+     fill1D(v_hist, "n_neutral_jets", n_neutral_jets);
+     if (n_neutral_jets > 9) neutral_event = true; // event has a large amount of neutral jets
+
+     //std::cout<<"# of Jets at the boundary:\t"<<n_jets_eta<<std::endl;
+     if (norm_jet) fill1D(v_hist, "PFJetMET", tlzv.Pt());
+     //  jet at boundary ===================================================================================
+     if (boundary_eta && jet_at_boundary){ // at least one jet at one of the hgcal boundaries
+       // for the beampipe, eta = 3.0 resolution
+       for (int igen = 0; igen != tlzv_vec.size(); igen++){
+	 tlzv_temp.SetPtEtaPhiE(0.0,0.0,0.0,0.0);         
+	 int ijet_store = 0;
+	 double min_dR = .21;
+	 bool matched_jet = false;
+	 for (int ijet = 0, njet = PFJetsPt.GetSize(); ijet < njet; ++ijet) {
+	   tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet],PFJetsEta[ijet],PFJetsPhi[ijet],PFJetsEnergy[ijet]);
+	   if (tlzv_vec[igen].DeltaR(tlzv_temp) <= 0.2){
+	     matched_jet = true;
+	     if ( tlzv_vec[igen].DeltaR(tlzv_temp) < min_dR ){
+	       min_dR = tlzv_vec[igen].DeltaR(tlzv_temp);
+	       ijet_store = ijet;
+	     }
+	   }
+	 }
+	 if (matched_jet) {
+	   tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet_store],PFJetsEta[ijet_store],PFJetsPhi[ijet_store],PFJetsEnergy[ijet_store]);
+	   double jet_reso = (tlzv_temp.Pt() - tlzv_vec[igen].Pt())/tlzv_vec[igen].Pt();
+	   fill1D(v_hist, "PFJet_Reso_beam", jet_reso);
+	 }
+       }
+       // for outer boundary, eta = 1.4 resolution
+       for (int igen = 0; igen != tlzv_vec_hcal.size(); igen++){
+	 tlzv_temp.SetPtEtaPhiE(0.0,0.0,0.0,0.0);         
+	 int ijet_store = 0;
+	 double min_dR = .21;
+	 bool matched_jet = false;
+	 for (int ijet = 0, njet = PFJetsPt.GetSize(); ijet < njet; ++ijet) {
+	   tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet],PFJetsEta[ijet],PFJetsPhi[ijet],PFJetsEnergy[ijet]);
+	   if (tlzv_vec_hcal[igen].DeltaR(tlzv_temp) <= 0.2){
+	     matched_jet = true;
+	     if ( tlzv_vec_hcal[igen].DeltaR(tlzv_temp) < min_dR ){
+	       min_dR = tlzv_vec_hcal[igen].DeltaR(tlzv_temp);
+	       ijet_store = ijet;
+	     }
+	   }
+	 }
+	 if (matched_jet) {
+	   tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet_store],PFJetsEta[ijet_store],PFJetsPhi[ijet_store],PFJetsEnergy[ijet_store]);
+	   double jet_reso_hcal = (tlzv_temp.Pt() - tlzv_vec_hcal[igen].Pt())/tlzv_vec_hcal[igen].Pt();
+	   fill1D(v_hist, "PFJet_Reso_hcal", jet_reso_hcal);
+	 }
+       }
+       // for the baseline resolution
+       for (int igen = 0; igen != tlzv_vec_base.size(); igen++){
+	 tlzv_temp.SetPtEtaPhiE(0.0,0.0,0.0,0.0);         
+	 int ijet_store = 0;
+	 double min_dR = .21;
+	 bool matched_jet = false;
+	 for (int ijet = 0, njet = PFJetsPt.GetSize(); ijet < njet; ++ijet) {
+	   tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet],PFJetsEta[ijet],PFJetsPhi[ijet],PFJetsEnergy[ijet]);
+	   if (tlzv_vec_base[igen].DeltaR(tlzv_temp) <= 0.2){
+	     matched_jet = true;
+	     if ( tlzv_vec_base[igen].DeltaR(tlzv_temp) < min_dR ){
+	       min_dR = tlzv_vec_base[igen].DeltaR(tlzv_temp);
+	       ijet_store = ijet;
+	     }
+	   }
+	 }
+	 if (matched_jet) {
+	   tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet_store],PFJetsEta[ijet_store],PFJetsPhi[ijet_store],PFJetsEnergy[ijet_store]);
+	   double jet_reso_base = (tlzv_temp.Pt() - tlzv_vec_base[igen].Pt())/tlzv_vec_base[igen].Pt();
+	   fill1D(v_hist, "PFJet_Reso_base", jet_reso_base);
+	 }
+       }
+       //============
+     }// endif ======
+     // low GenMET =========================================================================================
+     if (GenMET[0] < 10 && low_GenMET) { // requiring gen met to be low elliminates high neutrino events 
+       tlzv.SetPtEtaPhiE(0.0,0.0,0.0,0.0);       // for MET                                                                                                 
+       tlzv_temp.SetPtEtaPhiE(0.0,0.0,0.0,0.0);  // for MET   
+     
+       for (int ijet = 0, njet = PFJetsPt.GetSize(); ijet < njet; ++ijet) {
+       
+	 tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet],PFJetsEta[ijet],PFJetsPhi[ijet],PFJetsEnergy[ijet]);
+	 tlzv += tlzv_temp;
+       
+	 fill1D(v_hist,"PFJetEta",PFJetsEta[ijet]);
+       }
+       fill1D(v_hist, "PFJetMET", tlzv.Pt());
+     }
+     // large amount of neutral jet events ================================================================
+     if (neutral_event && large_neutral){
+       tlzv.SetPtEtaPhiE(0.0,0.0,0.0,0.0);       // for MET                                                                                                 
+       tlzv_temp.SetPtEtaPhiE(0.0,0.0,0.0,0.0);  // for MET   
+     
+       for (int ijet = 0, njet = PFJetsPt.GetSize(); ijet < njet; ++ijet) {
+       
+	 tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet],PFJetsEta[ijet],PFJetsPhi[ijet],PFJetsEnergy[ijet]);
+	 tlzv += tlzv_temp;
+       
+	 fill1D(v_hist,"PFJetEta",PFJetsEta[ijet]);
+       }
+       fill1D(v_hist, "PFJetMET", tlzv.Pt());
+       fill1D(v_hist, "PFMET", PFMET[0]   );
+     } 
+     // decent amount of neutral gen particles ===========================================================
+     if (gen_ratio > .09 && gen_neutral_ratio){
+       tlzv.SetPtEtaPhiE(0.0,0.0,0.0,0.0);       // for MET                                                                                                 
+       tlzv_temp.SetPtEtaPhiE(0.0,0.0,0.0,0.0);  // for MET   
+       
+       for (int ijet = 0, njet = PFJetsPt.GetSize(); ijet < njet; ++ijet) {
+       
+	 tlzv_temp.SetPtEtaPhiE(PFJetsPt[ijet],PFJetsEta[ijet],PFJetsPhi[ijet],PFJetsEnergy[ijet]);
+	 tlzv += tlzv_temp;
+       
+	 fill1D(v_hist,"PFJetEta",PFJetsEta[ijet]);
+       }
+       fill1D(v_hist, "PFJetMET", tlzv.Pt());
+       fill1D(v_hist, "PFMET", PFMET[0]   );
+     } 
+     // PFCLUSER analysis ================================================================================
+     for (int iclust = 0, nclust = PFClusterHGCalEta.GetSize(); iclust < nclust; ++iclust) {
+       fill1D(v_hist,"PFClusterPtvsEta",PFClusterHGCalEta[iclust], PFClusterHGCalPt[iclust]/(nentries*delta_phi*delta_eta));
+       fill1D(v_hist,"PFClustEta",PFClusterHGCalEta[iclust]);
+       fill1D(v_hist,"PFClustDepth", PFClusterHGCalDepth[iclust]);
+       //if (abs(PFClusterHGCalEta[iclust]) < .2){
+       //fill1D(v_hist,"NearZeroEta_ClustPt",abs(PFClusterHGCalPt[iclust]));
+	 //if (PFClusterHGCalPt[iclust] != 0) std::cout<<"Eta:\t"<<PFClusterHGCalEta[iclust]<<"\tPt:\t"<<PFClusterHGCalPt[iclust]<<"\tPhi:\t"<<PFClusterHGCalPhi[iclust]<<std::endl;
+       }
+     }
+     for (int isim = 0, nsim = HGCSimHitsEta.GetSize(); isim < nsim; ++isim){
+       fill1D(v_hist,"SimHitEta",HGCSimHitsEta[isim]);
+       fill1D(v_hist,"SimHitEvsEta",HGCSimHitsEta[isim], HGCSimHitsEnergy[isim]/(nentries*delta_phi*delta_eta));
+     }
+     for (int ireco = 0, nreco = HGCRecHitEta.GetSize(); ireco < nreco; ++ireco){
+       fill1D(v_hist,"RecHitEta",HGCRecHitEta[ireco]);
+       fill1D(v_hist,"RecHitEvsEta",HGCRecHitEta[ireco], HGCRecHitEnergy[ireco]/(nentries*delta_phi*delta_eta));
+       //if (abs(HGCRecHitEta[ireco]) < .2){
+       //fill1D(v_hist,"NearZeroEta_RecHitEnergy",HGCRecHitEnergy[ireco]);
+	 //if (HGCRecHitEnergy[ireco] >= 20) std::cout<<"Eta:\t"<<HGCRecHitEta[ireco]<<"\tEnergy:\t"<<HGCRecHitEnergy[ireco]<<"\tPhi:\t"<<HGCRecHitPhi[ireco]<<std::endl;
+       }
+     }
    }   // Event loop ends
    //---------------------------------------------------------------------------------------------------------
    // main event loop ends
    //---------------------------------------------------------------------------------------------------------
 
    // output file for histograms
+   std::cout<<"Output file: \t"<<outfile<<std::endl;
    TFile file_out(outfile,"RECREATE");
-   
+
    v_hist->Write();
    
    file_out.ls();
@@ -695,10 +612,30 @@ void PFCheckRun(TString rootfile, TString outfile, int maxevents=-1, int option=
 // Main function
 //
 //void ana_PFStudy(TString rootfile="../../HGCalTreeMaker/test/ttbar_10_4_D30_pt25.root",TString outfile="pfstudy_histograms.root",int maxevents=-1)
-void ana_PFStudy(TString rootfile="./ttbar_10_4_D30_pt25.root",TString outfile="PFD30_histos.root",int maxevents=-1)
+// "D30" for D30 geo, "D28" for D28
+void ana_main(TString geoType)
 {
-  PFCheckRun(rootfile, outfile, maxevents, 0);
+  int maxevents=20000;
+  // edit 
+  bool test_file = false; // if testing setup with single file (will have to edit below for file choice)
+  TString rootfile = "./ttbar_10_4_"+geoType+"_pt25.root";
+  TString outfile  = "PF"+geoType+"_histos.root";
+
+  std::vector<std::string> inputFiles;
+  if (!test_file){
+      inputFiles = GetInputFiles(geoType);
+    }
+  else inputFiles.push_back(static_cast<std::string>(rootfile));
+
+  PFCheckRun(inputFiles, outfile, maxevents, 0);
 }
+
+void ana_PFStudy(std::vector<TString> geoTypes = {"D28","D30"}){ // loop over HGCal geometry configurations
+  for (int i = 0; i != geoTypes.size(); i++){
+    ana_main(geoTypes[i]);
+  }
+}
+ 
 
 //
 // --- Aux ---
@@ -740,50 +677,48 @@ void bookHistograms(TList *v_hist)
   //
   // Booking histograms
   // 
-  sprintf(histo, "PFTask_hcalFrac1Zero_vs_pt");
-  book1DProf(v_hist, histo, 50., -1, 4., -1., 2.);
-  sprintf(histo, "PFTask_hcalFrac2Zero_vs_pt");
-  book1DProf(v_hist, histo, 50., -1, 4., -1., 2.);
-  sprintf(histo, "PFTask_hcalFrac3Zero_vs_pt");
-  book1DProf(v_hist, histo, 50., -1, 4., -1., 2.);
-  sprintf(histo, "PFTask_hcalFrac4Zero_vs_pt");
-  book1DProf(v_hist, histo, 50., -1, 4., -1., 2.);
-  sprintf(histo, "PFTask_hcalFrac5Zero_vs_pt");
-  book1DProf(v_hist, histo, 50., -1, 4., -1., 2.);
-  sprintf(histo, "PFTask_hcalFrac6Zero_vs_pt");
-  book1DProf(v_hist, histo, 50., -1, 4., -1., 2.);
-  sprintf(histo, "PFTask_hcalFrac7Zero_vs_pt");
-  book1DProf(v_hist, histo, 50., -1, 4., -1., 2.);
-  sprintf(histo, "PFTask_hcalFracAllZero_vs_pt");
-  book1DProf(v_hist, histo, 50., -1, 4., -1., 2.);
 
-  sprintf(histo, "PFTask_PdgId_vs_pt");              // added by Bryan
-  book2D(    v_hist, histo, 10., 0.5, 10.5, 100., 0., 10.);       // added by Bryan
-  relabel2D( v_hist, histo); // added by Bryan
+  sprintf(histo, "PFTask_PdgId_vs_pt");          
+  book2D(    v_hist, histo, 10., 0.5, 10.5, 100., 0., 10.); 
+  relabel2D( v_hist, histo);
 
+  std::map<int, TString>        pfpar_type;
+  pfpar_type[1] = "chargedHadron"; pfpar_type[2] = "electron"; pfpar_type[3] = "muon";
+  pfpar_type[4] = "photon"; pfpar_type[5] = "neutralHadron"; pfpar_type[6] = "HFHadron";
+  pfpar_type[7] = "HFPhoton";  
+  TString pfpar_pre = "PFPt_Eta_";
+
+  for (int i = 1; i <= 7; i++){
+    book1D( v_hist, static_cast<std::string>("PFPt_Eta_" +pfpar_type[i]), 100, -5, 5);
+  }
+  for (int i = 1; i <= 7; i++){
+    book1D( v_hist, static_cast<std::string>("PFPtvsEta_"+pfpar_type[i]), 100, -5, 5);
+  }
   ////
   //// Bryan's Studies 
   ////
+
+  sprintf(histo,"Neutral_Gen_Particles");
+  book1D( v_hist, histo, 100, 0. , 500);
+  sprintf(histo,"Neutral_Gen_Ratio");
+  book1D( v_hist, histo, 110, 0. , 1.1);
   
   sprintf(histo, "PFTask_PFEta_All");
   book1D(v_hist, histo, 100, -5., 5.);
   
   sprintf(histo, "PFTask_PFEta_ChargedHadron");
   book1D(v_hist, histo, 100, -5., 5.);
-
   sprintf(histo, "PFTask_PFEta_NeutralHadron");
   book1D(v_hist, histo, 100, -5., 5.);
-  
   sprintf(histo, "PFTask_PFEta_Electron");
   book1D(v_hist, histo, 100, -5., 5.);
-
+  sprintf(histo, "PFTask_PFEta_Muon");
+  book1D(v_hist, histo, 100, -5., 5.);
   sprintf(histo, "PFTask_PFEta_Photon");
   book1D(v_hist, histo, 100, -5., 5.);
-
-  sprintf(histo, "PFTask_PFEta_testPhoton");
+  sprintf(histo, "PFTask_PFEta_HF_Hadron");
   book1D(v_hist, histo, 100, -5., 5.);
-
-  sprintf(histo, "PFTask_PFEta_testHadron");
+  sprintf(histo, "PFTask_PFEta_HF_Photon");
   book1D(v_hist, histo, 100, -5., 5.);
 
   ///
@@ -791,86 +726,80 @@ void bookHistograms(TList *v_hist)
   ///
   
   sprintf(histo, "PFTask_MET");
-  book1D(v_hist, histo, 100, 0., 100.);
-  
-  //
-  // Charged hadrons
-  //
-  
-  sprintf(histo, "PFTask_ChargedHadron_TrackPtRatio_PtAbove5");
-  book1D(v_hist, histo, 70., -0.2, 1.2);
-  sprintf(histo, "PFTask_ChargedHadron_TrackPtRatio_Pt1To5");
-  book1D(v_hist, histo, 70., -0.2, 1.2);
-  sprintf(histo, "PFTask_ChargedHadron_TrackPtRatio_PtBelow1");
-  book1D(v_hist, histo, 70., -0.2, 1.2);
-  
-  sprintf(histo,"PFTask_Profile_ChargedHadron_Endcap_PtAbove5");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
-  sprintf(histo,"PFTask_Profile_ChargedHadron_Endcap_Pt1To5");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
-  sprintf(histo,"PFTask_Profile_ChargedHadron_Endcap_PtBelow1");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
+  book1D(v_hist, histo, 300, 0., 300.);
+  sprintf(histo, "PFParMET");
+  book1D(v_hist, histo, 300, 0., 300.);
+  sprintf(histo, "PFMET");
+  book1D(v_hist, histo, 300, 0., 300.);
 
-  // PF candidate Pt not 
-  sprintf(histo,"PFTask_Profile_ChargedHadron_Endcap_PtAbove5_Special");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
-  sprintf(histo,"PFTask_Profile_ChargedHadron_Endcap_Pt1To5_Special");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
-  sprintf(histo,"PFTask_Profile_ChargedHadron_Endcap_PtBelow1_Special");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
+  sprintf(histo, "GenMET");
+  book1D(v_hist, histo, 300, 0., 300.);
 
-  //
-  // PF electrons
-  //
-  
-  sprintf(histo, "PFTask_PFElectron_TrackPtRatio_PtAbove5");
-  book1D(v_hist, histo, 70., -0.2, 1.2);
-  sprintf(histo, "PFTask_PFElectron_TrackPtRatio_Pt1To5");
-  book1D(v_hist, histo, 70., -0.2, 1.2);
-  sprintf(histo, "PFTask_PFElectron_TrackPtRatio_PtBelow1");
-  book1D(v_hist, histo, 70., -0.2, 1.2);
-  
-  sprintf(histo,"PFTask_Profile_PFElectron_Endcap_PtAbove5");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
-  sprintf(histo,"PFTask_Profile_PFElectron_Endcap_Pt1To5");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
-  sprintf(histo,"PFTask_Profile_PFElectron_Endcap_PtBelow1");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
+  ///
+  /// Jets
+  ///
 
-  //
-  // PF photons
-  //
+  sprintf(histo, "PFJet_Reso_beam");
+  book1D(v_hist, histo, 150, -1.5, 1.5 );
+  sprintf(histo, "PFJet_Reso_hcal");
+  book1D(v_hist, histo, 150, -1.5, 1.5 );
+  sprintf(histo, "PFJet_Reso_base");
+  book1D(v_hist, histo, 150, -1.5, 1.5 );
   
-  sprintf(histo,"PFTask_Profile_PFPhoton_Endcap_PtAbove5");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
-  sprintf(histo,"PFTask_Profile_PFPhoton_Endcap_Pt1To5");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
-  sprintf(histo,"PFTask_Profile_PFPhoton_Endcap_PtBelow1");
-  book1DProf(v_hist, histo, 11, -3.5, 7.5, -1., 2., "S");
-  relabelProfA(v_hist, histo);
+  sprintf(histo, "GenJetMET");
+  book1D(v_hist, histo, 300, 0., 300.);
+  sprintf(histo, "PFJetMET");
+  book1D(v_hist, histo, 300, 0., 300.);
 
-  //
-  // Neutral hadrons
-  //
+  sprintf(histo, "GenJetEta");
+  book1D(v_hist, histo, 60, -6., 6.  );
+  sprintf(histo, "PFJetEta");
+  book1D(v_hist, histo, 60, -6., 6.  );
+
+  sprintf(histo, "n_neutral_jets");
+  book1D(v_hist, histo, 100, 0., 100.  );
+
+
+  sprintf(histo, "PFJetchargedHadronEFraction");
+  book1D(v_hist, histo, 110, 0., 1.1 );
+  sprintf(histo, "PFJetneutralEFraction");
+  book1D(v_hist, histo, 110, 0., 1.1 );
+  sprintf(histo, "PFJetchargedEMEFraction");
+  book1D(v_hist, histo, 110, 0., 1.1 );
+  sprintf(histo, "PFJetMuonEFraction");
+  book1D(v_hist, histo, 110, 0., 1.1 );
+  sprintf(histo, "PFJetneutralEMEFraction");
+  book1D(v_hist, histo, 110, 0., 1.1 );
+  sprintf(histo, "PFJetHFEMEFraction");
+  book1D(v_hist, histo, 110, 0., 1.1 );
+  sprintf(histo, "PFJetchargedHFHadronEFraction");
+  book1D(v_hist, histo, 110, 0., 1.1 );
+  sprintf(histo, "PFtotalneutralEFraction");
+  book1D(v_hist, histo, 110, 0., 1.1  );
   
-  sprintf(histo,"PFTask_hcalProfile_NeutralHadron_Endcap_PtAbove5");
-  book1DProf(v_hist, histo, 7, 0.5,7.5, -1., 2., "S");
-  sprintf(histo,"PFTask_hcalProfile_NeutralHadron_Endcap_Pt1To5");
-  book1DProf(v_hist, histo, 7, 0.5,7.5, -1., 2., "S");
-  sprintf(histo,"PFTask_hcalProfile_NeutralHadron_Endcap_PtBelow1");
-  book1DProf(v_hist, histo, 7, 0.5,7.5, -1., 2., "S");
-  
+  ///
+  /// PF Clusters
+  ///
+
+  sprintf(histo, "PFClustEta");
+  book1D(v_hist, histo, 100, -5., 5. ); 
+  sprintf(histo, "PFClusterPtvsEta");
+  book1D(v_hist, histo, 100, -5., 5.);
+  sprintf(histo, "PFClustDepth");
+  book1D(v_hist, histo, 100, -2., 2.);
+  sprintf(histo,"NearZeroEta_ClustPt");
+  book1D(v_hist, histo, 200, 0, 2);
+
+  sprintf(histo, "SimHitEta");
+  book1D(v_hist, histo, 100, -5., 5. ); 
+  sprintf(histo,"SimHitEvsEta");
+  book1D(v_hist, histo, 100, -5., 5.);
+  sprintf(histo, "RecHitEta");
+  book1D(v_hist, histo, 100, -5., 5.);
+  sprintf(histo,"RecHitEvsEta");
+  book1D(v_hist, histo, 100, -5., 5. ); 
+  sprintf(histo,"NearZeroEta_RecHitEnergy");
+  book1D(v_hist, histo, 200, 0, 2);
 }
 //
 // relabel 1DProf histograms
@@ -905,6 +834,11 @@ void fill1D(TList *v_hist, std::string name, double value)
 {
   TH1F* htemp = (TH1F*) v_hist->FindObject(name.c_str());
   htemp->Fill(value);
+}
+void fill1D(TList *v_hist, std::string name, double value, double valuey)
+{
+  TH1F* htemp = (TH1F*) v_hist->FindObject(name.c_str());
+  htemp->Fill(value, valuey);
 }
 //
 // Fill 1D Profile histograms
