@@ -20,6 +20,8 @@ TupleMaker_PFCandidates::TupleMaker_PFCandidates(const edm::ParameterSet& iConfi
   produces< std::vector< int > >(prefix + "PdgId" + suffix );
   produces< std::vector< int > >(prefix + "Status" + suffix );
 
+  produces< std::vector< int > >(prefix + "FromPV" + suffix );
+
   produces< std::vector< float > >(prefix + "EcalEnergyFrac"  + suffix );
   produces< std::vector< float > >(prefix + "HcalEnergyFrac"  + suffix );
   produces< std::vector< float > >(prefix + "HOEnergyFrac"  + suffix );
@@ -59,6 +61,8 @@ void TupleMaker_PFCandidates::produce(edm::Event& iEvent, const edm::EventSetup&
   std::unique_ptr<std::vector<int   > >            pdgid             ( new std::vector<int>              ());
   std::unique_ptr<std::vector<int   > >            status            ( new std::vector<int>              ());
 
+  std::unique_ptr<std::vector<int   > >            fromPV            ( new std::vector<int>              ());
+
   std::unique_ptr<std::vector<float>  >            ecalEnergyFrac        ( new std::vector<float>            ());
   std::unique_ptr<std::vector<float>  >            hcalEnergyFrac        ( new std::vector<float>            ());
   std::unique_ptr<std::vector<float>  >            hoEnergyFrac          ( new std::vector<float>            ());
@@ -95,18 +99,10 @@ void TupleMaker_PFCandidates::produce(edm::Event& iEvent, const edm::EventSetup&
       const pat::PackedCandidate& c = packedParticleFlow->at(i);
       
       if (debug){
-	//if (c.pdgId()==130){ // K0L neutral hadron
 	if (fabs(c.pdgId())==211){ // charged hadron
 	  std::cout << "pt,eta: " << c.pt() << " " << c.eta() << std::endl;
-	  //std::cout << c.ecalEnergy() << std::endl;
 	  std::cout << c.rawCaloFraction() << std::endl;
 	  std::cout << c.hcalFraction() << std::endl;
-	  /*
-	    std::cout << c.hoEnergy() << std::endl;
-	    std::cout << c.hcalDepthEnergyFraction(1) << " "
-	    << c.hcalDepthEnergyFraction(2) << " "
-	    << c.hcalDepthEnergyFraction(3) << std::endl;
-	  */
 	}
       }
 
@@ -114,12 +110,10 @@ void TupleMaker_PFCandidates::produce(edm::Event& iEvent, const edm::EventSetup&
       eta->push_back(c.eta());
       phi->push_back(c.phi());
       mass->push_back(c.mass());
-
       time->push_back(c.time());
       dTime->push_back(c.dtime());
       timeError->push_back(c.timeError());
-
-
+      fromPV->push_back(c.fromPV());
       pdgid->push_back(c.pdgId());
       status->push_back(c.status());
 
@@ -190,7 +184,6 @@ void TupleMaker_PFCandidates::produce(edm::Event& iEvent, const edm::EventSetup&
       hcalFrac7->push_back(c.hcalDepthEnergyFraction(7));
 
       time->push_back(c.time());
-
       timeError->push_back(c.timeError());
 
     }
@@ -209,6 +202,8 @@ void TupleMaker_PFCandidates::produce(edm::Event& iEvent, const edm::EventSetup&
 
   iEvent.put(move( pdgid           ) , prefix + "PdgId"         + suffix );
   iEvent.put(move( status          ) , prefix + "Status"        + suffix );
+
+  iEvent.put(move( fromPV          ) , prefix + "FromPV"        + suffix );
 
   iEvent.put(move( ecalEnergyFrac  ) , prefix + "EcalEnergyFrac"  + suffix );
   iEvent.put(move( hcalEnergyFrac  ) , prefix + "HcalEnergyFrac"  + suffix );
