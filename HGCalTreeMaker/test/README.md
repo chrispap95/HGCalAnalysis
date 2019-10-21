@@ -1,7 +1,14 @@
 
-## HGCAL tuple maker 
+# HGCAL tuple maker
+## Create Ntuples (UMD)
+To create ntuples for the samples you created, do:
+```bash
+cmsRun run_HGCalTupleMaker_2023.py inputFiles='file:../../../29005.0_SingleGammaPt35+SingleGammaPt35_pythia8_2023D41_GenSimHLBeamSpotFull+DigiFullTrigger_2023D41+RecoFullGlobal_2023D41+HARVESTFullGlobal_2023D41/step3.root' outputFile='out.root'
+```
+Be sure to use the correct directory for the step3.root file.
+The you can play with the ```rechitSum.cpp``` script to plot the HGCRecHit sum.
 
-### Normal mode
+## Normal mode (BaylorU)
 ```
 cmsRun run_HGCalTupleMaker_2023.py
 cmsRun run_HGCalTupleMaker_2023.py inputFiles='file:../../../24034.0_TTbar_14TeV+TTbar_14TeV_TuneCUETP8M1_2023D28_GenSimHLBeamSpotFull14+DigiFullTrigger_2023D28+RecoFullGlobal_2023D28+HARVESTFullGlobal_2023D28/step3.root' outputFile='ntuples_TTbar.root'
@@ -48,7 +55,7 @@ HGCDigisHEfront
 HGCDigisHEback
 edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "mix"                       "HGCDigisEE"      "HLT"     
 edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "mix"                       "HGCDigisHEback"   "HLT"     
-edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "mix"                       "HGCDigisHEfront"   "HLT" 
+edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "mix"                       "HGCDigisHEfront"   "HLT"
 and
 edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "hgcalDigis"                "EE"              "RECO"    
 edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "hgcalDigis"                "HEback"          "RECO"    
@@ -100,4 +107,3 @@ edm::SortedCollection<HGCRecHit,edm::StrictWeakOrdering<HGCRecHit> >    "HGCalRe
 uncalibRH.amplitude() * weights_[layer](dEdx, MeV, corrected for energy loss in passive materials) * 0.001 (MeV->GeV)  
  rcorr_[thickness] (0.88, 0.92, or 1) * cce_correction (GeV)
 ```
-
