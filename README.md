@@ -1,4 +1,14 @@
+#Instructions for initial setup
+First set up a CMSSW release. In this study we need to use geometry D41, so you need at least a version ```CMSSW_10_6_X``` and up. To run that you need a ```slc7_amd64_gcc820``` architecture. You can either find that by logging into ```lxplus7.cern.ch``` or ```siab-1.umd.edu```.
 
+In your work area (say ```/data/users/$USER``` or ```/afs/cern.ch/work/${your_inital}/$USER```) do
+```bash
+cmsrel CMSSW_10_6_3_patch1
+cd CMSSW_10_6_3_patch1/src
+cmsenv
+git clone https://github.com/chrispap95/HGCalAnalysis.git
+scramv1 b -j 8
+```
 # HGCalAnalysis
 
 ```
