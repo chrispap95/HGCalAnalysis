@@ -25,17 +25,20 @@ Then you can execute step by step the commands listed under ```29005.0_SingleGam
 ```bash
 cmsDriver.py SingleGammaPt35_pythia8_cfi  --conditions auto:phase2_realistic -n 100 \
     --era Phase2C8_timing_layer_bar --eventcontent FEVTDEBUG --relval 9000,50 -s GEN,SIM \
-    --datatier GEN-SIM --beamspot HLLHC --geometry Extended2023D41 --fileout file:step1.root  > \ step1_SingleGammaPt35+SingleGammaPt35_pythia8_2023D41_GenSimHLBeamSpotFull+DigiFullTrigger_2023D41+RecoFullGlobal_2023D41+HARVESTFullGlobal_2023D41.log  2>&1
+    --datatier GEN-SIM --beamspot HLLHC --geometry Extended2023D41 --fileout file:step1.root  > \
+    step1_SingleGammaPt35+SingleGammaPt35_pythia8_2023D41_GenSimHLBeamSpotFull+DigiFullTrigger_2023D41+RecoFullGlobal_2023D41+HARVESTFullGlobal_2023D41.log  2>&1
 
 cmsDriver.py step2  --conditions auto:phase2_realistic \
     -s DIGI:pdigi_valid,L1,L1TrackTrigger,DIGI2RAW,HLT:@fake2 \
     --datatier GEN-SIM-DIGI-RAW -n 100 --geometry Extended2023D41 --era Phase2C8_timing_layer_bar \
-    --eventcontent FEVTDEBUGHLT --filein  file:step1.root  --fileout file:step2.root  > \ step2_SingleGammaPt35+SingleGammaPt35_pythia8_2023D41_GenSimHLBeamSpotFull+DigiFullTrigger_2023D41+RecoFullGlobal_2023D41+HARVESTFullGlobal_2023D41.log  2>&1
+    --eventcontent FEVTDEBUGHLT --filein  file:step1.root  --fileout file:step2.root  > \
+    step2_SingleGammaPt35+SingleGammaPt35_pythia8_2023D41_GenSimHLBeamSpotFull+DigiFullTrigger_2023D41+RecoFullGlobal_2023D41+HARVESTFullGlobal_2023D41.log  2>&1
 
 cmsDriver.py step3  --conditions auto:phase2_realistic -n 100 --era Phase2C8_timing_layer_bar \
     --eventcontent FEVTDEBUGHLT --runUnscheduled  \
     -s RAW2DIGI,L1Reco,RECO,RECOSIM,PAT,VALIDATION:@phase2Validation+@miniAODValidation,DQM:@phase2+@miniAODDQM \
-    --datatier GEN-SIM-RECO --geometry Extended2023D41 --filein  file:step2.root  --fileout file:step3.root  > \ step3_SingleGammaPt35+SingleGammaPt35_pythia8_2023D41_GenSimHLBeamSpotFull+DigiFullTrigger_2023D41+RecoFullGlobal_2023D41+HARVESTFullGlobal_2023D41.log  2>&1
+    --datatier GEN-SIM-RECO --geometry Extended2023D41 --filein  file:step2.root  --fileout file:step3.root  > \
+    step3_SingleGammaPt35+SingleGammaPt35_pythia8_2023D41_GenSimHLBeamSpotFull+DigiFullTrigger_2023D41+RecoFullGlobal_2023D41+HARVESTFullGlobal_2023D41.log  2>&1
 ```
 This will create 100 events under the file ```step3.root```. Now, you can go to ```HGCalTreeMaker/test``` to run the ntuplizer on the samples you created.
 
