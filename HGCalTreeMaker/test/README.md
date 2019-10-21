@@ -1,17 +1,5 @@
-# Intstructions for initial setup
-First set up a CMSSW release. In this study we need to use geometry D41, so you need at least a version CMSSW_10_6_X and up. To run that you need a ```slc7_amd64_gcc820``` architecture. You can either find that by logging into ```lxplus7.cern.ch``` or ```siab-1.umd.edu```.
 
-In your work area (say /data/users/$USER or /afs/cern.ch/work/${your_inital}/$USER) do
-```bash
-cmsrel CMSSW_10_6_3_patch1
-cd CMSSW_10_6_3_patch1/src
-cmsenv
-git clone https://github.com/chrispap95/HGCalAnalysis.git
-scramv1 b -j 8
-```
-
-
-## HGCAL tuple maker
+## HGCAL tuple maker 
 
 ### Normal mode
 ```
@@ -60,7 +48,7 @@ HGCDigisHEfront
 HGCDigisHEback
 edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "mix"                       "HGCDigisEE"      "HLT"     
 edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "mix"                       "HGCDigisHEback"   "HLT"     
-edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "mix"                       "HGCDigisHEfront"   "HLT"
+edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "mix"                       "HGCDigisHEfront"   "HLT" 
 and
 edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "hgcalDigis"                "EE"              "RECO"    
 edm::SortedCollection<HGCDataFrame<DetId,HGCSample>,edm::StrictWeakOrdering<HGCDataFrame<DetId,HGCSample> > >    "hgcalDigis"                "HEback"          "RECO"    
@@ -112,3 +100,4 @@ edm::SortedCollection<HGCRecHit,edm::StrictWeakOrdering<HGCRecHit> >    "HGCalRe
 uncalibRH.amplitude() * weights_[layer](dEdx, MeV, corrected for energy loss in passive materials) * 0.001 (MeV->GeV)  
  rcorr_[thickness] (0.88, 0.92, or 1) * cce_correction (GeV)
 ```
+
