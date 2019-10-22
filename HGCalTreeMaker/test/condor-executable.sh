@@ -47,7 +47,11 @@ cmsDriver.py step3  --conditions auto:phase2_realistic -n 100 --era Phase2C8_tim
     --datatier GEN-SIM-RECO --geometry Extended2023D41 --filein  file:step2_${UNIQUE_ID}_${CONDOR_PROCESS}.root  --fileout file:step3_${UNIQUE_ID}_${CONDOR_PROCESS}.root
 
 rm -f step2_${UNIQUE_ID}_${CONDOR_PROCESS}.root
-mv step3_${UNIQUE_ID}_${CONDOR_PROCESS}.root ${OUT_DIR}
+
+cmsRun /data/users/chpapage/CMSSW_10_6_3_patch1/src/full-sim/HGCalAnalysis/HGCalTreeMaker/test/run_HGCalTupleMaker_2023.py inputFiles='file:step3_${UNIQUE_ID}_${CONDOR_PROCESS}.root' outputFile='${UNIQUE_ID}_${CONDOR_PROCESS}.root'
+
+rm -f step3_${UNIQUE_ID}_${CONDOR_PROCESS}.root
+mv ${UNIQUE_ID}_${CONDOR_PROCESS}.root ${OUT_DIR}
 
 echo ""
 END_TIME=`/bin/date`

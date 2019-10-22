@@ -58,7 +58,7 @@ process.source = cms.Source("PoolSource",
     skipEvents = cms.untracked.uint32(options.skipEvents) # default is 0.
 )
 
-process.TFileService = cms.Service("TFileService", 
+process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string(options.outputFile)
 )
 
@@ -78,7 +78,7 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
 #process.load('Configuration.Geometry.GeometryExtended2023D17Reco_cff')  # <=== to be checked
-process.load('Configuration.Geometry.GeometryExtended2023D28Reco_cff')
+process.load('Configuration.Geometry.GeometryExtended2023D41Reco_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.L1Reco_cff')

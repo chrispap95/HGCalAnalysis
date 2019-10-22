@@ -7,5 +7,5 @@ Output = cmsDriver_$(cluster)_$(process).stdout
 Error = cmsDriver_$(cluster)_$(process).stderr
 Log = cmsDriver_$(cluster)_$(process).condor
 
-Arguments = simple5new $(process) /data/users/chpapage/standalone/PFCal/PFCalEE/analysis 5
+Arguments = SingleGammaPt100Eta1p7 $(process) /data/users/chpapage/CMSSW_10_6_3_patch1/mc_production /data/users/chpapage/cmssw-mc/gamma
 Queue
