@@ -19,12 +19,14 @@ echo "started at $START_TIME"
 #
 cd $RUN_DIR
 
+export PATH=/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin
+source /cvmfs/cms.cern.ch/cmsset_default.sh  ## if a bash script, use .sh instead of .csh
+
+
 cd /data/users/chpapage/CMSSW_10_6_3_patch1/src
 export USERBASE=`pwd`
 export ARCH=slc7_amd64_gcc820
 export SCRAM_ARCH=slc7_amd64_gcc820
-
-cmsenv
 
 FINAL_PREFIX_NAME=`echo ${UNIQUE_ID}_${CONDOR_PROCESS}`
 FINAL_LOG=`echo $FINAL_PREFIX_NAME.log`
