@@ -42,6 +42,38 @@ cmsDriver.py step3  --conditions auto:phase2_realistic -n 100 --era Phase2C8_tim
 ```
 This will create 100 events under the file ```step3.root```. Now, you can go to ```HGCalTreeMaker/test``` to run the ntuplizer on the samples you created.
 
+## Create samples using your own configuration (UMD)
+In case you want to create your own configuration for samples generation, you can create it using the preexisting configurations as templates.
+First, in the ```src``` directory do:
+```bash
+git cms-addpkg Configuration/Generator
+mkdir -pv Configuration/GenProduction/python
+cp Configuration/Generator/python/SingleGammaPt35_pythia8_cfi.py Configuration/GenProduction/python
+```
+Then edit the file at ```Configuration/GenProduction/python/SingleGammaPt35_pythia8_cfi.py``` and rename it accordingly.
+Build everything:
+```bash
+scramv1 b -j 8
+```
+Then create a directory where you are going to create the samples and inside it you can do:
+```bash
+cmsDriver.py Configuration/GenProduction/python/SingleGamma<something>_pythia8_cfi.py --conditions auto:phase2_realistic -n 100 \
+    --era Phase2C8_timing_layer_bar --eventcontent FEVTDEBUG --relval 9000,50 -s GEN,SIM \
+    --datatier GEN-SIM --beamspot HLLHC --geometry Extended2023D41 --fileout file:step1.root  > \
+    step1_<someLogFile>.log  2>&1
+
+cmsDriver.py step2  --conditions auto:phase2_realistic \
+    -s DIGI:pdigi_valid,L1,L1TrackTrigger,DIGI2RAW,HLT:@fake2 \
+    --datatier GEN-SIM-DIGI-RAW -n 100 --geometry Extended2023D41 --era Phase2C8_timing_layer_bar \
+    --eventcontent FEVTDEBUGHLT --filein  file:step1.root  --fileout file:step2.root  > \
+    step2_<someLogFile>.log  2>&1
+
+cmsDriver.py step3  --conditions auto:phase2_realistic -n 100 --era Phase2C8_timing_layer_bar \
+    --eventcontent FEVTDEBUGHLT --runUnscheduled  \
+    -s RAW2DIGI,L1Reco,RECO,RECOSIM,PAT,VALIDATION:@phase2Validation+@miniAODValidation,DQM:@phase2+@miniAODDQM \
+    --datatier GEN-SIM-RECO --geometry Extended2023D41 --filein  file:step2.root  --fileout file:step3.root  > \
+    step3_<someLogFile>.log  2>&1
+```
 
 ## Instructions from BaylorU
 
