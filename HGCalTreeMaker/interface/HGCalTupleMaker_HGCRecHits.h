@@ -91,7 +91,7 @@ protected:
             int type, zside;
             int cellU=-100, cellV=-100, waferU=-100, waferV=-100;
             int ieta=-100, iphi=-100, ietaAbs=-100;
-            int subdet;
+            int subdet(0);
             HepGeom::Point3D<float> gcoord;
 
             if (nameDetector_ == "HCal") {
@@ -106,7 +106,7 @@ protected:
 
                 for (const auto & it : *(HGCRecHits.product())) {
                     DetId detId = it.id();
-                    subdet = detId.subdetId();
+                    //subdet = detId.subdetId();
                     int ilayer = HcalDetId(detId).depth();
                     auto cellGeometry = geometry->getSubdetectorGeometry(detId)->getGeometry(detId);
                     gcoord = HepGeom::Point3D<float>(cellGeometry->getPosition().x(),
@@ -141,8 +141,8 @@ protected:
                         cellGeometry->getPosition().z());
 
                     HGCSiliconDetId detIdSi = HGCSiliconDetId(detId);
-                    subdet           = ForwardEmpty;
-                    /*cellU            = detIdSi.cellU();
+                    /*subdet           = ForwardEmpty;
+                    cellU            = detIdSi.cellU();
                     cellV            = detIdSi.cellV();
                     waferU           = detIdSi.waferU();
                     waferV           = detIdSi.waferV();
