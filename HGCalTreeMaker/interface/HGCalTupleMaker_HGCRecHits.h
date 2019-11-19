@@ -265,12 +265,12 @@ protected:
         posy     -> push_back ( global.y()       );
         posz     -> push_back ( global.z()       );
         v_index  -> push_back ( index            );
-        v_ieta   -> push_back ( global.ietaAbs() );
+        /*v_ieta   -> push_back ( global.ietaAbs() );
         v_iphi   -> push_back ( global.iphi()    );
         v_cellu  -> push_back ( global.cellU()   );
         v_cellv  -> push_back ( global.cellV()   );
         v_waferu -> push_back ( global.waferU()  );
-        v_waferv -> push_back ( global.waferV()  );
+        v_waferv -> push_back ( global.waferV()  );*/
     }
 };
 
