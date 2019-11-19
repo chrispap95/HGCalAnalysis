@@ -133,12 +133,12 @@ protected:
                     DetId detId = it.id();
                     //KH int ilayer   = HGCalDetId(detId).layer();
                     int ilayer  = ((geomType == 0) ? HGCalDetId(detId).layer() :
-                    ((geomType == 1) ? HGCSiliconDetId(detId).layer() :
-                    HGCScintillatorDetId(detId).layer()));
+                        ((geomType == 1) ? HGCSiliconDetId(detId).layer() :
+                        HGCScintillatorDetId(detId).layer()));
                     auto cellGeometry = geometry->getSubdetectorGeometry(detId)->getGeometry(detId);
-                    gcoord = HepGeom::Point3D<float>(cellGeometry->getPosition().x(),
-                    cellGeometry->getPosition().y(),
-                    cellGeometry->getPosition().z());
+                        gcoord = HepGeom::Point3D<float>(cellGeometry->getPosition().x(),
+                        cellGeometry->getPosition().y(),
+                        cellGeometry->getPosition().z());
 
                     HGCSiliconDetId detIdSi = HGCSiliconDetId(detId);
                     subdet           = ForwardEmpty;
@@ -147,8 +147,8 @@ protected:
                     waferU           = detIdSi.waferU();
                     waferV           = detIdSi.waferV();
                     type             = detIdSi.type();
-                    layer            = detIdSi.layer();
-                    zside            = detIdSi.zside();
+                    //layer            = detIdSi.layer();
+                    //zside            = detIdSi.zside();
 
                     run(detIdSi, ilayer, index, geom0, &it);
                 }
