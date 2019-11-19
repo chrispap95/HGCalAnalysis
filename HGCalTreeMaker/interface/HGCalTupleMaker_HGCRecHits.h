@@ -87,7 +87,7 @@ protected:
 
 //******************************************************************************
             // HCal's geometry
-            int cell, type, sector, subsector, layer, zside;
+            //int cell, type, sector, subsector, layer, zside;
             int cellU=-100, cellV=-100, waferU=-100, waferV=-100;
             int ieta=-100, iphi=-100, ietaAbs=-100;
             int subdet(0);
