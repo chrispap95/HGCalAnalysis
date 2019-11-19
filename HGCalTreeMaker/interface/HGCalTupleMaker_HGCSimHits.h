@@ -10,15 +10,6 @@
 #include "FWCore/Utilities/interface/EDGetToken.h"
 #include "FWCore/Utilities/interface/transform.h"
 
-#include "FWCore/Framework/interface/EDProducer.h"
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/Utilities/interface/InputTag.h"
-#include "FWCore/Framework/interface/Event.h"
-#include "FWCore/Framework/interface/ESHandle.h"
-#include "FWCore/Framework/interface/ESTransientHandle.h"
-#include "FWCore/Utilities/interface/EDGetToken.h"
-#include "FWCore/Utilities/interface/transform.h"
-
 // PCaloHits objects
 #include "SimDataFormats/CaloHit/interface/PCaloHitContainer.h"
 #include "SimDataFormats/CaloHit/interface/PCaloHit.h"
@@ -31,9 +22,6 @@
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
 #include "Geometry/HGCalCommonData/interface/HGCalDDDConstants.h"
 #include "Geometry/HcalCommonData/interface/HcalDDDRecConstants.h"
-
-#include "DataFormats/HcalDetId/interface/HcalTestNumbering.h"
-
 #include "Geometry/HcalCommonData/interface/HcalHitRelabeller.h"
 
 //-----------------------------------------------------
@@ -111,15 +99,16 @@ protected:
             }
             if (debug) std::cout << nameDetector_ << " " << PCaloHits->size() << std::endl;
 
+//******************************************************************************
             //---------------------------------------------------
             // Loop over PCaloHits
             //---------------------------------------------------
             for (const auto & it : *(PCaloHits.product())) {
-                int    cell, type, sector, subsector, layer, zside;
-                int    cellU=-100, cellV=-100, waferU=-100, waferV=-100;
-                int    ieta=-100, iphi=-100, ietaAbs=-100;
+                int cell, type, sector, subsector, layer, zside;
+                int cellU=-100, cellV=-100, waferU=-100, waferV=-100;
+                int ieta=-100, iphi=-100, ietaAbs=-100;
 
-                int    subdet(0);
+                int subdet(0);
                 HepGeom::Point3D<float> gcoord;
                 unsigned int id_ = it.id();
 
@@ -129,7 +118,7 @@ protected:
                     // - Validation/HGCalValidation/plugins/HGCalSimHitValidation.cc
                     //---------------------------------------------------
                     HcalDetId detId = HcalHitRelabeller::relabel(id_,hcConr_);
-                    subdet           = detId.subdet();
+                    subdet          = detId.subdet();
 
                     if (debug) std::cout << it.energy() << " " << subdet << std::endl;
 
@@ -146,7 +135,7 @@ protected:
                     ////double etaS = cellGeometry->getPosition().eta();
                     ////double phiS = cellGeometry->getPosition().phi();
 
-                    iSetup.get<CaloGeometryRecord>().get (geometry);
+                    iSetup.get<CaloGeometryRecord>().get(geometry);
                     auto cellGeometry = geometry->getSubdetectorGeometry(detId)->getGeometry(detId);
 
                     //---------------------------------------------------
@@ -275,7 +264,7 @@ protected:
 
                 v_energy -> push_back ( it.energy() );
 
-                if (debug_geom){
+                if (debug_geom) {
                     double rout_layer[52]={
                         1567.5, 1567.5, 1575.6, 1575.6, 1583.7,
                         1583.7, 1591.8, 1591.8, 1599.9, 1599.9,
@@ -352,9 +341,9 @@ public:
       m_suffix         (iConfig.getUntrackedParameter<std::string>  ("Suffix")) {
         produces<std::vector<float> > ( m_prefix + "Energy" + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Time"   + m_suffix );
-        produces<std::vector<int>   > ( m_prefix + "Subdet" + m_suffix );
-        produces<std::vector<int>   > ( m_prefix + "Layer"  + m_suffix );
-        produces<std::vector<int>   > ( m_prefix + "Index"  + m_suffix );
+        produces<std::vector<int  > > ( m_prefix + "Subdet" + m_suffix );
+        produces<std::vector<int  > > ( m_prefix + "Layer"  + m_suffix );
+        produces<std::vector<int  > > ( m_prefix + "Index"  + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Eta"    + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Phi"    + m_suffix );
         if (detid_store){
@@ -369,14 +358,13 @@ public:
         produces<std::vector<float> > ( m_prefix + "Posy"   + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Posz"   + m_suffix );
     }
-
     std::unique_ptr<std::vector<float> > v_energy;
     std::unique_ptr<std::vector<float> > v_energyem;
     std::unique_ptr<std::vector<float> > v_energyhad;
     std::unique_ptr<std::vector<float> > v_time;
-    std::unique_ptr<std::vector<int>   > v_id;
-    std::unique_ptr<std::vector<int>   > v_index; // index for different input collections
-    std::unique_ptr<std::vector<int>   > v_subdet;
+    std::unique_ptr<std::vector<int  > > v_id;
+    std::unique_ptr<std::vector<int  > > v_index; // index for different input collections
+    std::unique_ptr<std::vector<int  > > v_subdet;
 
     std::unique_ptr<std::vector<int  > > v_cell; //
     std::unique_ptr<std::vector<int  > > v_sector; // wafer
