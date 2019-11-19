@@ -142,13 +142,13 @@ protected:
 
                     HGCSiliconDetId detIdSi = HGCSiliconDetId(detId);
                     subdet           = ForwardEmpty;
-                    cellU            = detIdSi.cellU();
+                    /*cellU            = detIdSi.cellU();
                     cellV            = detIdSi.cellV();
                     waferU           = detIdSi.waferU();
                     waferV           = detIdSi.waferV();
                     type             = detIdSi.type();
                     //layer            = detIdSi.layer();
-                    //zside            = detIdSi.zside();
+                    //zside            = detIdSi.zside();*/
 
                     run(detIdSi, ilayer, index, geom0, &it);
                 }
