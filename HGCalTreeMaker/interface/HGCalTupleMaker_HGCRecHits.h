@@ -105,7 +105,7 @@ protected:
 
                 for (const auto & it : *(HGCRecHits.product())) {
                     DetId detId = it.id();
-                    subdet = detId.subdet();
+                    subdet = detId.subdetId();
                     int ilayer = HcalDetId(detId).depth();
                     auto cellGeometry = geometry->getSubdetectorGeometry(detId)->getGeometry(detId);
                     gcoord = HepGeom::Point3D<float>(cellGeometry->getPosition().x(),
