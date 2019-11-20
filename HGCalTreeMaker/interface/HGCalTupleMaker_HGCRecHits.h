@@ -154,10 +154,10 @@ protected:
                     //zside            = detIdSi.zside();*/
                     //v_ieta   -> push_back ( ieta   );
                     //v_iphi   -> push_back ( iphi   );
-                    v_cellu  -> push_back ( cellU  );
+                    /*v_cellu  -> push_back ( cellU  );
                     v_cellv  -> push_back ( cellV  );
                     v_waferu -> push_back ( waferU );
-                    v_waferv -> push_back ( waferV );
+                    v_waferv -> push_back ( waferV );*/
 
                     run(detIdSi, ilayer, index, geom0, &it);
                 }
@@ -185,12 +185,12 @@ public:
         produces<std::vector<int  > > ( m_prefix + "Index"  + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Eta"    + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Phi"    + m_suffix );
-        produces<std::vector<int  > > ( m_prefix + "IEta"   + m_suffix );
+        /*produces<std::vector<int  > > ( m_prefix + "IEta"   + m_suffix );
         produces<std::vector<int  > > ( m_prefix + "IPhi"   + m_suffix );
         produces<std::vector<int  > > ( m_prefix + "CellU"  + m_suffix );
         produces<std::vector<int  > > ( m_prefix + "CellV"  + m_suffix );
         produces<std::vector<int  > > ( m_prefix + "WaferU" + m_suffix );
-        produces<std::vector<int  > > ( m_prefix + "WaferV" + m_suffix );
+        produces<std::vector<int  > > ( m_prefix + "WaferV" + m_suffix );*/
         produces<std::vector<float> > ( m_prefix + "Posx"   + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Posy"   + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Posz"   + m_suffix );
@@ -218,12 +218,12 @@ public:
     std::unique_ptr<std::vector<float> > v_eta;
     std::unique_ptr<std::vector<float> > v_phi;
 
-    std::unique_ptr<std::vector<int  > > v_ieta;
+    /*std::unique_ptr<std::vector<int  > > v_ieta;
     std::unique_ptr<std::vector<int  > > v_iphi;
     std::unique_ptr<std::vector<int  > > v_cellu;
     std::unique_ptr<std::vector<int  > > v_cellv;
     std::unique_ptr<std::vector<int  > > v_waferu;
-    std::unique_ptr<std::vector<int  > > v_waferv;
+    std::unique_ptr<std::vector<int  > > v_waferv;*/
 
 
 protected:
@@ -236,12 +236,12 @@ protected:
         posy     = std::unique_ptr<std::vector<float> > ( new std::vector<float> ());
         posz     = std::unique_ptr<std::vector<float> > ( new std::vector<float> ());
         v_index  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        v_ieta   = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
+        /*v_ieta   = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
         v_iphi   = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
         v_cellu  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
         v_cellv  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
         v_waferu = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        v_waferv = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
+        v_waferv = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());*/
     }
 
     void dumpAlgo( edm::Event & iEvent ){
@@ -253,12 +253,12 @@ protected:
         iEvent.put( move(posy     ), m_prefix + "Posy"   + m_suffix );
         iEvent.put( move(posz     ), m_prefix + "Posz"   + m_suffix );
         iEvent.put( move(v_index  ), m_prefix + "Index"  + m_suffix );
-        iEvent.put( move(v_ieta   ), m_prefix + "IEta"   + m_suffix );
+        /*iEvent.put( move(v_ieta   ), m_prefix + "IEta"   + m_suffix );
         iEvent.put( move(v_iphi   ), m_prefix + "IPhi"   + m_suffix );
         iEvent.put( move(v_cellu  ), m_prefix + "CellU"  + m_suffix );
         iEvent.put( move(v_cellv  ), m_prefix + "CellV"  + m_suffix );
         iEvent.put( move(v_waferu ), m_prefix + "WaferU" + m_suffix );
-        iEvent.put( move(v_waferv ), m_prefix + "WaferV" + m_suffix );
+        iEvent.put( move(v_waferv ), m_prefix + "WaferV" + m_suffix );*/
     }
 
     template<class T1, class T2>
