@@ -141,6 +141,8 @@ protected:
                         cellGeometry->getPosition().z());
 
                     HGCSiliconDetId detIdSi = HGCSiliconDetId(detId);
+                    cellU = detIdSi.cellU();
+                    v_ieta   -> push_back ( cellU );
                     /*subdet           = ForwardEmpty;
                     cellU            = detIdSi.cellU();
                     cellV            = detIdSi.cellV();
