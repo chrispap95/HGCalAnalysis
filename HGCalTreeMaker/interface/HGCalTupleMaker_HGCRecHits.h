@@ -89,7 +89,7 @@ protected:
             // HCal's geometry
             //int cell, type, sector, subsector, layer, zside;
             //int type, zside;
-            //int cellU=-100, cellV=-100, waferU=-100, waferV=-100;
+            int cellU=-100, cellV=-100, waferU=-100, waferV=-100;
             //int ieta=-100, iphi=-100, ietaAbs=-100;
             //int subdet(0);
             HepGeom::Point3D<float> gcoord;
@@ -141,12 +141,11 @@ protected:
                         cellGeometry->getPosition().z());
 
                     HGCSiliconDetId detIdSi = HGCSiliconDetId(detId);
-                    cellU            = detIdSi.cellU();
                     //subdet           = ForwardEmpty;
-                    cellU            = detIdSi.cellU();
-                    cellV            = detIdSi.cellV();
-                    waferU           = detIdSi.waferU();
-                    waferV           = detIdSi.waferV();
+                    //cellU            = detIdSi.cellU();
+                    //cellV            = detIdSi.cellV();
+                    //waferU           = detIdSi.waferU();
+                    //waferV           = detIdSi.waferV();
                     //ieta             = detIdSi.ietaAbs();
                     //iphi             = detIdSi.iphi();
                     //type             = detIdSi.type();
