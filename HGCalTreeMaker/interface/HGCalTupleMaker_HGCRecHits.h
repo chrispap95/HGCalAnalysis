@@ -147,13 +147,13 @@ protected:
                     cellV            = detIdSi.cellV();
                     waferU           = detIdSi.waferU();
                     waferV           = detIdSi.waferV();
-                    ieta             = detIdSi.ietaAbs();
-                    iphi             = detIdSi.iphi();
+                    //ieta             = detIdSi.ietaAbs();
+                    //iphi             = detIdSi.iphi();
                     //type             = detIdSi.type();
                     //layer            = detIdSi.layer();
                     //zside            = detIdSi.zside();*/
-                    v_ieta   -> push_back ( ieta   );
-                    v_iphi   -> push_back ( iphi   );
+                    //v_ieta   -> push_back ( ieta   );
+                    //v_iphi   -> push_back ( iphi   );
                     v_cellu  -> push_back ( cellU  );
                     v_cellv  -> push_back ( cellV  );
                     v_waferu -> push_back ( waferU );
