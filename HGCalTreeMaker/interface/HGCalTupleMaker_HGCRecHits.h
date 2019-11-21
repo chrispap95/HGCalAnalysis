@@ -17,9 +17,9 @@
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
 #include "Geometry/HGCalGeometry/interface/HGCalGeometry.h"
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
-#include "Geometry/HGCalCommonData/interface/HGCalDDDConstants.h"
-#include "Geometry/HcalCommonData/interface/HcalDDDRecConstants.h"
-#include "Geometry/HcalCommonData/interface/HcalHitRelabeller.h"
+//* #include "Geometry/HGCalCommonData/interface/HGCalDDDConstants.h"
+//* #include "Geometry/HcalCommonData/interface/HcalDDDRecConstants.h"
+//* #include "Geometry/HcalCommonData/interface/HcalHitRelabeller.h"
 
 // Used:
 // http://cmslxr.fnal.gov/source/AnalysisAlgos/SiStripClusterInfoProducer/plugins/SiStripProcessedRawDigiProducer.cc
@@ -39,15 +39,15 @@ protected:
 
     bool debug=false;
 
-    //HGC Geometry
-    std::vector<const HGCalDDDConstants*> hgcCons_;
-    std::vector<const HGCalGeometry*>     hgcGeometry_;
-    const HcalDDDSimConstants*            hcCons_;
-    const HcalDDDRecConstants*            hcConr_;
-    const CaloSubdetectorGeometry*        hcGeometry_;
-
-    edm::ESHandle<CaloGeometry> geometry;
-    std::map<uint32_t, HepGeom::Transform3D> transMap_;
+    //* //HGC Geometry
+    //* std::vector<const HGCalDDDConstants*> hgcCons_;
+    //* std::vector<const HGCalGeometry*>     hgcGeometry_;
+    //* const HcalDDDSimConstants*            hcCons_;
+    //* const HcalDDDRecConstants*            hcConr_;
+    //* const CaloSubdetectorGeometry*        hcGeometry_;
+    //*
+    //* edm::ESHandle<CaloGeometry> geometry;
+    //* std::map<uint32_t, HepGeom::Transform3D> transMap_;
 
     void produce( edm::Event & iEvent, const edm::EventSetup & iSetup) {
         //-----------------------------------------------------
@@ -86,13 +86,13 @@ protected:
             }
 
 //******************************************************************************
-            // HCal's geometry
-            //int cell, type, sector, subsector, layer, zside;
-            //int type, zside;
-            int cellU=-100, cellV=-100, waferU=-100, waferV=-100;
-            //int ieta=-100, iphi=-100, ietaAbs=-100;
-            //int subdet(0);
-            HepGeom::Point3D<float> gcoord;
+            //* HCal's geometry
+            //* int cell, type, sector, subsector, layer, zside;
+            //* int type, zside;
+            //* int cellU=-100, cellV=-100, waferU=-100, waferV=-100;
+            //* int ieta=-100, iphi=-100, ietaAbs=-100;
+            //* int subdet(0);
+            //* HepGeom::Point3D<float> gcoord;
 
             if (nameDetector_ == "HCal") {
                 edm::ESHandle<CaloGeometry> geom;
@@ -106,12 +106,12 @@ protected:
 
                 for (const auto & it : *(HGCRecHits.product())) {
                     DetId detId = it.id();
-                    //subdet = detId.subdetId();
+                    //* subdet = detId.subdetId();
                     int ilayer = HcalDetId(detId).depth();
-                    auto cellGeometry = geometry->getSubdetectorGeometry(detId)->getGeometry(detId);
-                    gcoord = HepGeom::Point3D<float>(cellGeometry->getPosition().x(),
-                    cellGeometry->getPosition().y(),
-                    cellGeometry->getPosition().z());
+                    //* auto cellGeometry = geometry->getSubdetectorGeometry(detId)->getGeometry(detId);
+                    //* gcoord = HepGeom::Point3D<float>(cellGeometry->getPosition().x(),
+                    //* cellGeometry->getPosition().y(),
+                    //* cellGeometry->getPosition().z());
                     run(detId, ilayer, index, geom0, &it);
                 }
             } else {
@@ -135,28 +135,28 @@ protected:
                     int ilayer  = ((geomType == 0) ? HGCalDetId(detId).layer() :
                         ((geomType == 1) ? HGCSiliconDetId(detId).layer() :
                         HGCScintillatorDetId(detId).layer()));
-                    auto cellGeometry = geometry->getSubdetectorGeometry(detId)->getGeometry(detId);
-                        gcoord = HepGeom::Point3D<float>(cellGeometry->getPosition().x(),
-                        cellGeometry->getPosition().y(),
-                        cellGeometry->getPosition().z());
+                    //* auto cellGeometry = geometry->getSubdetectorGeometry(detId)->getGeometry(detId);
+                    //*     gcoord = HepGeom::Point3D<float>(cellGeometry->getPosition().x(),
+                    //*     cellGeometry->getPosition().y(),
+                    //*     cellGeometry->getPosition().z());
 
-                    HGCSiliconDetId detIdSi = HGCSiliconDetId(detId);
-                    //subdet           = ForwardEmpty;
-                    //cellU            = detIdSi.cellU();
-                    //cellV            = detIdSi.cellV();
-                    //waferU           = detIdSi.waferU();
-                    //waferV           = detIdSi.waferV();
-                    //ieta             = detIdSi.ietaAbs();
-                    //iphi             = detIdSi.iphi();
-                    //type             = detIdSi.type();
-                    //layer            = detIdSi.layer();
-                    //zside            = detIdSi.zside();*/
-                    //v_ieta   -> push_back ( ieta   );
-                    //v_iphi   -> push_back ( iphi   );
-                    /*v_cellu  -> push_back ( cellU  );
-                    v_cellv  -> push_back ( cellV  );
-                    v_waferu -> push_back ( waferU );
-                    v_waferv -> push_back ( waferV );*/
+                    //* HGCSiliconDetId detIdSi = HGCSiliconDetId(detId);
+                    //* subdet           = ForwardEmpty;
+                    //* cellU            = detIdSi.cellU();
+                    //* cellV            = detIdSi.cellV();
+                    //* waferU           = detIdSi.waferU();
+                    //* waferV           = detIdSi.waferV();
+                    //* ieta             = detIdSi.ietaAbs();
+                    //* iphi             = detIdSi.iphi();
+                    //* type             = detIdSi.type();
+                    //* layer            = detIdSi.layer();
+                    //* zside            = detIdSi.zside();
+                    //* v_ieta   -> push_back ( ieta   );
+                    //* v_iphi   -> push_back ( iphi   );
+                    //* v_cellu  -> push_back ( cellU  );
+                    //* v_cellv  -> push_back ( cellV  );
+                    //* v_waferu -> push_back ( waferU );
+                    //* v_waferv -> push_back ( waferV );
 
                     run(detIdSi, ilayer, index, geom0, &it);
                 }
@@ -178,18 +178,18 @@ public:
       m_prefix          (iConfig.getUntrackedParameter<std::string>  ("Prefix")),
       m_suffix          (iConfig.getUntrackedParameter<std::string>  ("Suffix")) {
         produces<std::vector<float> > ( m_prefix + "Energy" + m_suffix );
-        produces<std::vector<float> > ( m_prefix + "Time"   + m_suffix );
-        produces<std::vector<int  > > ( m_prefix + "Subdet" + m_suffix );
+        //* produces<std::vector<float> > ( m_prefix + "Time"   + m_suffix );
+        //* produces<std::vector<int  > > ( m_prefix + "Subdet" + m_suffix );
         produces<std::vector<int  > > ( m_prefix + "Layer"  + m_suffix );
         produces<std::vector<int  > > ( m_prefix + "Index"  + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Eta"    + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Phi"    + m_suffix );
-        /*produces<std::vector<int  > > ( m_prefix + "IEta"   + m_suffix );
-        produces<std::vector<int  > > ( m_prefix + "IPhi"   + m_suffix );
-        produces<std::vector<int  > > ( m_prefix + "CellU"  + m_suffix );
-        produces<std::vector<int  > > ( m_prefix + "CellV"  + m_suffix );
-        produces<std::vector<int  > > ( m_prefix + "WaferU" + m_suffix );
-        produces<std::vector<int  > > ( m_prefix + "WaferV" + m_suffix );*/
+        //* produces<std::vector<int  > > ( m_prefix + "IEta"   + m_suffix );
+        //* produces<std::vector<int  > > ( m_prefix + "IPhi"   + m_suffix );
+        //* produces<std::vector<int  > > ( m_prefix + "CellU"  + m_suffix );
+        //* produces<std::vector<int  > > ( m_prefix + "CellV"  + m_suffix );
+        //* produces<std::vector<int  > > ( m_prefix + "WaferU" + m_suffix );
+        //* produces<std::vector<int  > > ( m_prefix + "WaferV" + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Posx"   + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Posy"   + m_suffix );
         produces<std::vector<float> > ( m_prefix + "Posz"   + m_suffix );
@@ -203,27 +203,26 @@ public:
     std::unique_ptr<std::vector<float> > posy;
     std::unique_ptr<std::vector<float> > posz;
     std::unique_ptr<std::vector<int  > > v_index;
-    std::unique_ptr<std::vector<int  > > v_subdet;
+    //* std::unique_ptr<std::vector<int  > > v_subdet;
 
-    std::unique_ptr<std::vector<int  > > v_cell; //
-    std::unique_ptr<std::vector<int  > > v_sector; // wafer
-    std::unique_ptr<std::vector<int  > > v_subsector; // type
-    std::unique_ptr<std::vector<int  > > v_layer;
-    std::unique_ptr<std::vector<int  > > v_zside;
+    //* std::unique_ptr<std::vector<int  > > v_cell; //
+    //* std::unique_ptr<std::vector<int  > > v_sector; // wafer
+    //* std::unique_ptr<std::vector<int  > > v_subsector; // type
+    //* std::unique_ptr<std::vector<int  > > v_layer;
+    //* std::unique_ptr<std::vector<int  > > v_zside;
 
-    std::unique_ptr<std::vector<float> > v_posx;
-    std::unique_ptr<std::vector<float> > v_posy;
-    std::unique_ptr<std::vector<float> > v_posz;
-    std::unique_ptr<std::vector<float> > v_eta;
-    std::unique_ptr<std::vector<float> > v_phi;
+    //* std::unique_ptr<std::vector<float> > v_posx;
+    //* std::unique_ptr<std::vector<float> > v_posy;
+    //* std::unique_ptr<std::vector<float> > v_posz;
+    //* std::unique_ptr<std::vector<float> > v_eta;
+    //* std::unique_ptr<std::vector<float> > v_phi;
 
-    /*std::unique_ptr<std::vector<int  > > v_ieta;
-    std::unique_ptr<std::vector<int  > > v_iphi;
-    std::unique_ptr<std::vector<int  > > v_cellu;
-    std::unique_ptr<std::vector<int  > > v_cellv;
-    std::unique_ptr<std::vector<int  > > v_waferu;
-    std::unique_ptr<std::vector<int  > > v_waferv;*/
-
+    //* std::unique_ptr<std::vector<int  > > v_ieta;
+    //* std::unique_ptr<std::vector<int  > > v_iphi;
+    //* std::unique_ptr<std::vector<int  > > v_cellu;
+    //* std::unique_ptr<std::vector<int  > > v_cellv;
+    //* std::unique_ptr<std::vector<int  > > v_waferu;
+    //* std::unique_ptr<std::vector<int  > > v_waferv;*/
 
 protected:
     void loadAlgo(){
@@ -235,12 +234,12 @@ protected:
         posy     = std::unique_ptr<std::vector<float> > ( new std::vector<float> ());
         posz     = std::unique_ptr<std::vector<float> > ( new std::vector<float> ());
         v_index  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        /*v_ieta   = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        v_iphi   = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        v_cellu  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        v_cellv  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        v_waferu = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        v_waferv = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());*/
+        //* v_ieta   = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
+        //* v_iphi   = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
+        //* v_cellu  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
+        //* v_cellv  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
+        //* v_waferu = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
+        //* v_waferv = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());*/
     }
 
     void dumpAlgo( edm::Event & iEvent ){
@@ -252,12 +251,12 @@ protected:
         iEvent.put( move(posy     ), m_prefix + "Posy"   + m_suffix );
         iEvent.put( move(posz     ), m_prefix + "Posz"   + m_suffix );
         iEvent.put( move(v_index  ), m_prefix + "Index"  + m_suffix );
-        /*iEvent.put( move(v_ieta   ), m_prefix + "IEta"   + m_suffix );
-        iEvent.put( move(v_iphi   ), m_prefix + "IPhi"   + m_suffix );
-        iEvent.put( move(v_cellu  ), m_prefix + "CellU"  + m_suffix );
-        iEvent.put( move(v_cellv  ), m_prefix + "CellV"  + m_suffix );
-        iEvent.put( move(v_waferu ), m_prefix + "WaferU" + m_suffix );
-        iEvent.put( move(v_waferv ), m_prefix + "WaferV" + m_suffix );*/
+        //* iEvent.put( move(v_ieta   ), m_prefix + "IEta"   + m_suffix );
+        //* iEvent.put( move(v_iphi   ), m_prefix + "IPhi"   + m_suffix );
+        //* iEvent.put( move(v_cellu  ), m_prefix + "CellU"  + m_suffix );
+        //* iEvent.put( move(v_cellv  ), m_prefix + "CellV"  + m_suffix );
+        //* iEvent.put( move(v_waferu ), m_prefix + "WaferU" + m_suffix );
+        //* iEvent.put( move(v_waferv ), m_prefix + "WaferV" + m_suffix );*/
     }
 
     template<class T1, class T2>
@@ -274,12 +273,12 @@ protected:
         posy     -> push_back ( global.y()       );
         posz     -> push_back ( global.z()       );
         v_index  -> push_back ( index            );
-        /*v_ieta   -> push_back ( global.ietaAbs() );
-        v_iphi   -> push_back ( global.iphi()    );
-        v_cellu  -> push_back ( global.cellU()   );
-        v_cellv  -> push_back ( global.cellV()   );
-        v_waferu -> push_back ( global.waferU()  );
-        v_waferv -> push_back ( global.waferV()  );*/
+        //* v_ieta   -> push_back ( global.ietaAbs() );
+        //* v_iphi   -> push_back ( global.iphi()    );
+        //* v_cellu  -> push_back ( global.cellU()   );
+        //* v_cellv  -> push_back ( global.cellV()   );
+        //* v_waferu -> push_back ( global.waferU()  );
+        //* v_waferv -> push_back ( global.waferV()  );*/
     }
 };
 
