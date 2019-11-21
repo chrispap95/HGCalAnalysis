@@ -219,10 +219,10 @@ public:
 
     //* std::unique_ptr<std::vector<int  > > v_ieta;
     //* std::unique_ptr<std::vector<int  > > v_iphi;
-    //* std::unique_ptr<std::vector<int  > > v_cellu;
-    //* std::unique_ptr<std::vector<int  > > v_cellv;
-    //* std::unique_ptr<std::vector<int  > > v_waferu;
-    //* std::unique_ptr<std::vector<int  > > v_waferv;*/
+    std::unique_ptr<std::vector<int  > > v_cellu;
+    std::unique_ptr<std::vector<int  > > v_cellv;
+    std::unique_ptr<std::vector<int  > > v_waferu;
+    std::unique_ptr<std::vector<int  > > v_waferv;
 
 protected:
     void loadAlgo(){
@@ -236,10 +236,10 @@ protected:
         v_index  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
         //* v_ieta   = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
         //* v_iphi   = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        //* v_cellu  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        //* v_cellv  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        //* v_waferu = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        //* v_waferv = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());*/
+        v_cellu  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
+        v_cellv  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
+        v_waferu = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
+        v_waferv = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());*/
     }
 
     void dumpAlgo( edm::Event & iEvent ){
@@ -253,10 +253,10 @@ protected:
         iEvent.put( move(v_index  ), m_prefix + "Index"  + m_suffix );
         //* iEvent.put( move(v_ieta   ), m_prefix + "IEta"   + m_suffix );
         //* iEvent.put( move(v_iphi   ), m_prefix + "IPhi"   + m_suffix );
-        //* iEvent.put( move(v_cellu  ), m_prefix + "CellU"  + m_suffix );
-        //* iEvent.put( move(v_cellv  ), m_prefix + "CellV"  + m_suffix );
-        //* iEvent.put( move(v_waferu ), m_prefix + "WaferU" + m_suffix );
-        //* iEvent.put( move(v_waferv ), m_prefix + "WaferV" + m_suffix );*/
+        iEvent.put( move(v_cellu  ), m_prefix + "CellU"  + m_suffix );
+        iEvent.put( move(v_cellv  ), m_prefix + "CellV"  + m_suffix );
+        iEvent.put( move(v_waferu ), m_prefix + "WaferU" + m_suffix );
+        iEvent.put( move(v_waferv ), m_prefix + "WaferV" + m_suffix );
     }
 
     template<class T1, class T2>
