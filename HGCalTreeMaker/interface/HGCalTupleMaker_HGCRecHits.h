@@ -239,7 +239,7 @@ protected:
         v_cellu  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
         v_cellv  = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
         v_waferu = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
-        v_waferv = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());*/
+        v_waferv = std::unique_ptr<std::vector<int  > > ( new std::vector<int  > ());
     }
 
     void dumpAlgo( edm::Event & iEvent ){
