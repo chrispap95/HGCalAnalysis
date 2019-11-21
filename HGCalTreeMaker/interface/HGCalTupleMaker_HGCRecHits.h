@@ -158,7 +158,7 @@ protected:
                     //* v_waferu -> push_back ( waferU );
                     //* v_waferv -> push_back ( waferV );
 
-                    run(detIdSi, ilayer, index, geom0, &it);
+                    run(detId, ilayer, index, geom0, &it);
                 }
             } // Hcal or HGcal for geometry
         } // Looping over different rechit collections
