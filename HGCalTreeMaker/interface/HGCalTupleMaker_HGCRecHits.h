@@ -17,9 +17,9 @@
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
 #include "Geometry/HGCalGeometry/interface/HGCalGeometry.h"
 #include "DataFormats/HcalDetId/interface/HcalDetId.h"
-//* #include "Geometry/HGCalCommonData/interface/HGCalDDDConstants.h"
-//* #include "Geometry/HcalCommonData/interface/HcalDDDRecConstants.h"
-//* #include "Geometry/HcalCommonData/interface/HcalHitRelabeller.h"
+#include "Geometry/HGCalCommonData/interface/HGCalDDDConstants.h"
+#include "Geometry/HcalCommonData/interface/HcalDDDRecConstants.h"
+#include "Geometry/HcalCommonData/interface/HcalHitRelabeller.h"
 
 // Used:
 // http://cmslxr.fnal.gov/source/AnalysisAlgos/SiStripClusterInfoProducer/plugins/SiStripProcessedRawDigiProducer.cc
@@ -39,15 +39,15 @@ protected:
 
     bool debug=false;
 
-    //* //HGC Geometry
-    //* std::vector<const HGCalDDDConstants*> hgcCons_;
-    //* std::vector<const HGCalGeometry*>     hgcGeometry_;
-    //* const HcalDDDSimConstants*            hcCons_;
-    //* const HcalDDDRecConstants*            hcConr_;
-    //* const CaloSubdetectorGeometry*        hcGeometry_;
-    //*
-    //* edm::ESHandle<CaloGeometry> geometry;
-    //* std::map<uint32_t, HepGeom::Transform3D> transMap_;
+    //HGC Geometry
+    std::vector<const HGCalDDDConstants*> hgcCons_;
+    std::vector<const HGCalGeometry*>     hgcGeometry_;
+    const HcalDDDSimConstants*            hcCons_;
+    const HcalDDDRecConstants*            hcConr_;
+    const CaloSubdetectorGeometry*        hcGeometry_;
+
+    edm::ESHandle<CaloGeometry> geometry;
+    std::map<uint32_t, HepGeom::Transform3D> transMap_;
 
     void produce( edm::Event & iEvent, const edm::EventSetup & iSetup) {
         //-----------------------------------------------------
